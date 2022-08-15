@@ -9,7 +9,8 @@ const renderPage = (quiz, ui) => {
     } else {
         ui.showQuestion(quiz.getCurrentQuestion().text)
         ui.showChoices(quiz.getCurrentQuestion().choices, (currentChoice) => {
-            quiz.validateAndContinue(currentChoice)
+            //quiz.validateAndContinue(currentChoice)
+            quiz.addScoreAndContinue(currentChoice);
             renderPage(quiz, ui)
         })
         ui.showProgress(quiz.questionIndex +1, questionsArray.length)

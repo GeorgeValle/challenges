@@ -18,8 +18,8 @@ export class UI {
 
     showScore(score) {
         const quizEndHTML = `
-            <h1>Result</h1>
-            <h2>Your final score is: ${score}</h2>
+            <h1>Result of Evaluation</h1>
+            <h2>Teacher's final score is: ${score}</h2>
         `
         const element = document.getElementById("quiz")
         element.innerHTML = quizEndHTML
