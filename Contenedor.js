@@ -4,15 +4,17 @@ const fs=require('fs');
 // save the path to json file
 const addressJProduct='./products.txt';
 
-//create teh new class Container
+//create the new class Container
 class Contenedor{
     save= async (product) => {
         //validations
         if(!product.title||!product.price||!product.thumbnail) return{status:"error", message: "missing product"}
     
     try{
+        
         if(fs.existsSync(addressJProduct)){
-            let data= await fs.promises.readFile(addressJProduct,'utf-8')
+            
+            let data= await fs.promises.readFile(addressJProduct,'utf-8');
             let  products = JSON.parse(data);
             let  id = products[products.length-1].id+1;
             product.id=id;
@@ -63,7 +65,10 @@ class Contenedor{
         if (fs.existsSync(addressJProduct)) {
             let data = await fs.promises.readFile(addressJProduct, 'utf-8')
             let products = JSON.parse(data)
+            
             let newProducts = products.filter(product => product.id !== id)
+            // let indexId= products.findIdex(products.id===id)
+            // let newProducts = products.slice(indexId);
             await fs.promises.writeFile(addressJProduct, JSON.stringify(newProducts, null, 2))
             return {status: "success", message: "Product deleted!"}
         } else {
@@ -73,7 +78,8 @@ class Contenedor{
 
     deleteAll = async () => {
         if (fs.existsSync(addressJProduct)) {
-            await fs.promises.writeFile(addressJProduct, JSON.stringify([],null,2))
+            await fs.promises.writeFile(addressJProduct, JSON.stringify(null,null,2))
+            //await fs.unLink(addressJProduct)
             
             return {status: "success", message: "Products deleted!"}
         } else {
