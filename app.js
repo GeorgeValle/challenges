@@ -1,4 +1,4 @@
-import express, { json } from 'express';
+const express = require('express');
 const app= express();
 
 const Contenedor = require('./Contenedor.js')
@@ -11,43 +11,27 @@ const server =app.listen(8080,() => console.log('listening on port 8080'));
 //show error in the server conection
 server.on('error', error => console.log(`error in server: ${error} `));
 
-app.use(json());
 
 
-app.get('/', (req, res) => {
 
-    `<html>
-        <head>
-        </head>
-        <body>
-            <h2>Producto<h2>
-        </body>
-    </html>`
-}
+// app.get('/', (req, res) => {
 
-);
+    
 
+// );
+app.use(express.json());
+app.use(express.static('public'));
 //return all products
-app.get('/api/products', (req, res) => {
-    res.send({products})
-    }
-)
+app.use.get('/api/products', productsRouter);
 
 //returns a product by ID
-app.get('/api/products/:id', (req, res) => {
-    
-}
-);
+app.use.get('/api/products/:id', productsRouter);
 
-//recive and update a product by its ID
-app.post('/api/products', (req, res) => {
-    }
-);
+//recive and save a product by its ID
+app.use.post('/api/products', productsRouter);
 
-app.put('/api/products/:id', (req, res) => {
-    }
-);
+//recive and update a product by id
+app.use.put('/api/products/:id', productsRouter);
 
-app.delete('/api/products/:id', (req, res) => {
-    }
-);
+//recive and delete a product by its ID
+app.use.delete('/api/products/:id', productsRouter);

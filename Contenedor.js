@@ -23,6 +23,18 @@ class Contenedor{
         }catch (err){console.error(err)}
     }
 
+    validationsID= async(id)=>{
+        try{
+            if(!fs.existsSync(addressJProduct)) return res.status(400).send({error:"not existence data base"});
+            let products = await this.#read();
+            if(isNaN(id)) return res.status(400).send({error:"not existence Id. Please, enter only numbers"});
+            if(id<0)return res.status(400).send({error:"not existence Id. Please, enter Id above 0"});
+            if(id>products.length+1) return res.status(400).send({error:"out of range"});
+            return id;
+            
+        }catch (err){console.error(err)}
+    }
+
     save= async (product) => {
         //validations
         if(!product.title||!product.price||!product.thumbnail) return{status:"error", message: "missing product"}
@@ -78,6 +90,26 @@ class Contenedor{
         } else {
             return {status: "error", message: err.message}
         }
+    }
+
+    updateById= async (id, product) => {
+        if (!id) return {status: "error", message: "Id required"}
+        try{
+            if (fs.existsSync(addressJProduct)) {
+                let products = await this.#read();
+                elementIndex = products.findIndex((prod=> prod.id===id));
+                    if (!elementIndex===-1){
+                        product.id=id;
+                        products[elementIndex]=product;
+                        this.#write(products);
+                        return {success: 'product updated'}
+                    }
+
+            }
+        }catch(err){
+            return{status:"error", message: err.message}
+        }
+
     }
 
     deleteById = async (id) => {
