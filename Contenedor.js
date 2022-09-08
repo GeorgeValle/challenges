@@ -37,7 +37,7 @@ class Contenedor{
 
     save= async (product) => {
         //validations
-        if(!product.title||!product.price||!product.thumbnail) return{status:"error", message: "missing product"}
+        if(!product.title||!product.price||!product.thumbnail) return{status:"error", message: 'data is requiered'}
     
     try{
         
@@ -46,8 +46,11 @@ class Contenedor{
             let products= await this.#read();
             let  id = products[products.length-1].id+1;
             
-            
-            product.id=id;
+            product= {
+                id,
+                ...product
+            }
+
             products.push(product);
 
             
@@ -56,7 +59,12 @@ class Contenedor{
             return{status:"success", message: `Product  Created`};
 
         }else{
-            product.id=1;
+            // product.id=1;
+            product ={
+                id:1,
+                ...product
+            }
+
             await fs.promises.writeFile(addressJProduct, JSON.stringify([product],null,2))
             
             return{status:"success", message: "Product created"}
@@ -71,13 +79,15 @@ class Contenedor{
 
     getById = async (id) => {
         //Validation
+
         if (!id) return {status: "error", message: "Id required"}
+        id=parseInt(id,10);
         if (fs.existsSync(addressJProduct)) {
             let products = await this.#read();
             let product = products.find(product => product.id === id)
             if (product) return {status: "succes", message: product}
             return {status: "error", message: "Product not found"}
-        } else {
+        } else (err)=>{
             return {status: "error", message: err.message}
         }
     }
@@ -87,22 +97,28 @@ class Contenedor{
         if (fs.existsSync(addressJProduct)) {
             let products= await this.#read();
             return {status: "success", message: products}
-        } else {
+        } else (err)=>{
             return {status: "error", message: err.message}
         }
     }
 
     updateById= async (id, product) => {
         if (!id) return {status: "error", message: "Id required"}
+        id=parseInt(id, 10);
         try{
             if (fs.existsSync(addressJProduct)) {
                 let products = await this.#read();
-                elementIndex = products.findIndex((prod=> prod.id===id));
-                    if (!elementIndex===-1){
-                        product.id=id;
+                let elementIndex = products.findIndex((prod=> prod.id===id));
+                    if (!elementIndex==-1){
+                        //product.id=id;
+                        product= {
+                            id,
+                            ...product
+                        }
+
                         products[elementIndex]=product;
                         this.#write(products);
-                        return {success: 'product updated'}
+                        return await this.getById(id);
                     }
 
             }
@@ -115,6 +131,7 @@ class Contenedor{
     deleteById = async (id) => {
         //Validation
         if (!id) return {status: "error", message: "Id required"}
+        id=parseInt(id, 10);
         if (fs.existsSync(addressJProduct)) {
             let products = await this.#read();
             
