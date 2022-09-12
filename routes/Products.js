@@ -23,16 +23,17 @@ router.get('/:id', (req, res) => {
     }
 )
 
-//recive and save a product by its ID
+//receives and save a product by its ID
 router.post('/', (req, res) => {
 
+    if (!req.body.title||!req.body.price||!req.body.thumbnail) return res.send({error: 'data is required'});
         container.save(req.body).then(result=>res.send(result));
     }
 )
-//recive and update a product by id
+//receives and update a product by id
 router.put('/:id',  (req, res) => {
 
-    if (!req.body.title||!req.body.price||!req.body.thumbnail) return res.send({error: 'data is requiered'});
+    if (!req.body.title||!req.body.price||!req.body.thumbnail) return res.send({error: 'data is required'});
     //let index =  container.validationsID(req.params.id);
     //container.updateById(index, req.body).then(result=>res.send(result));
     container.updateById(req.params.id, req.body).then(result=>res.send(result));
@@ -41,7 +42,7 @@ router.put('/:id',  (req, res) => {
     }
 )
 
-//recive and delete a product by its ID
+//receives and delete a product by its ID
 router.delete('/:id', (req, res) => {
         let result = container.deleteById(req.params.id);
         res.send(result)

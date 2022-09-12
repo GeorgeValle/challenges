@@ -37,7 +37,7 @@ class Contenedor{
 
     save= async (product) => {
         //validations
-        if(!product.title||!product.price||!product.thumbnail) return{status:"error", message: 'data is requiered'}
+        
     
     try{
         
@@ -54,7 +54,7 @@ class Contenedor{
             products.push(product);
 
             
-            //ahora escribe en un funcion
+            // now write in a function
             this.#write(products);
             return{status:"success", message: `Product  Created`};
 
@@ -85,7 +85,7 @@ class Contenedor{
         if (fs.existsSync(addressJProduct)) {
             let products = await this.#read();
             let product = products.find(product => product.id === id)
-            if (product) return {status: "succes", message: product}
+            if (product) return {status: "success", message: product}
             return {status: "error", message: "Product not found"}
         } else (err)=>{
             return {status: "error", message: err.message}
@@ -109,7 +109,7 @@ class Contenedor{
             if (fs.existsSync(addressJProduct)) {
                 let products = await this.#read();
                 let elementIndex = products.findIndex((prod=> prod.id===id));
-                    if (!elementIndex==-1){
+                    if (elementIndex!==-1){
                         //product.id=id;
                         product= {
                             id,
@@ -117,7 +117,7 @@ class Contenedor{
                         }
 
                         products[elementIndex]=product;
-                        this.#write(products);
+                        await this.#write(products);
                         return await this.getById(id);
                     }
 
