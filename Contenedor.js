@@ -44,7 +44,10 @@ class Contenedor{
         if(fs.existsSync(addressJProduct)){
             
             let products= await this.#read();
-            let  id = products[products.length-1].id+1;
+            let  id;
+            if(products.length===0){id=0}
+                id = products[products.length-1].id+1;
+                product.price= parseFloat(product.price)
             
             product= {
                 id,
@@ -60,6 +63,7 @@ class Contenedor{
 
         }else{
             // product.id=1;
+            product.price= parseFloat(product.price)
             product ={
                 id:1,
                 ...product
@@ -67,8 +71,7 @@ class Contenedor{
 
             await fs.promises.writeFile(addressJProduct, JSON.stringify([product],null,2))
             
-            return{status:"success", message: "Product created"}
-
+            return product;
         }
 
 
@@ -96,7 +99,7 @@ class Contenedor{
     getAll= async () => {
         if (fs.existsSync(addressJProduct)) {
             let products= await this.#read();
-            return {status: "success", message: products}
+            return  products;
         } else (err)=>{
             return {status: "error", message: err.message}
         }

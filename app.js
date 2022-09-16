@@ -1,6 +1,7 @@
 const express = require('express');
 const app= express();
 
+
 const handlebars = require('express-handlebars');
 
 
@@ -16,18 +17,21 @@ server.on('error', error => console.log(`error in server: ${error} `));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 //app.use(express.static('public'));
+
 //route to productos
-app.use('/api/productos', productsRouter);
+app.use('/productos', productsRouter);
 
 // Handlebars config
-const hbs = handlebars.create({
-    extname: 'hbs',
-    defaultLayout: 'main',
-    layoutsDir: __dirname + '/views/layouts/',
-})
+// const hbs = handlebars.create({
+//     extname: 'hbs',
+//     defaultLayout: 'main',
+//     layoutsDir: __dirname + '/views/layouts/',
+// })
 
-app.engine('hbs', hbs.engine)
-app.set('view engine', 'hbs')
+app.engine('handlebars', handlebars.engine)
+
+
+app.set('view engine', 'handlebars')
 app.set('views', 'views')
 
 

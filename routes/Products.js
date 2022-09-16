@@ -7,13 +7,15 @@ const container = new Contenedor();
 
 //return all products
 router.get('/', (req, res) => {
-    container.getAll()
-        .then((products)=>{ 
-            res.render('products', { products })
+    // container.getAll()
+    //     .then((products)=>{ 
+    //         res.render('products', { products })
+    let result= container.getAll()
+    res.render('products', {products:result})
         })
-        .catch(error => { res.status(500).json(error) })
-    }
-)
+        
+    
+
 
 
 
@@ -24,12 +26,7 @@ router.post('/', (req, res) => {
         let product= req.body;
         product.price=parseFloat(product.price);
         container.save(req.body)
-        .then(data => {
-            container.getById(data)
-                .then(prod => { res.redirect('/api/productos') })
-                .catch(error => { res.status(500).json(error) })
-        })
-        .catch(error => { res.status(500).json(error) })
+        res.redirect('/productos');
     }
     
 )
