@@ -7,12 +7,12 @@ const container = new Contenedor();
 
 //return all products
 router.get('/', (req, res) => {
-    // container.getAll()
-    //     .then((products)=>{ 
-    //         res.render('products', { products })
+    
     let result= container.getAll()
-    res.render('products', {products:result})
+    res.render('get-products', {
+        products:result
         })
+    })
         
     
 
@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
         let product= req.body;
         product.price=parseFloat(product.price);
         container.save(req.body)
-        res.redirect('/productos');
+        res.redirect('/');
     }
     
 )

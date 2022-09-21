@@ -59,7 +59,7 @@ class Contenedor{
             
             // now write in a function
             this.#write(products);
-            return{status:"success", message: `Product  Created`};
+            return products;
 
         }else{
             // product.id=1;
