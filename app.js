@@ -19,7 +19,7 @@ app.use(express.urlencoded({extended:true}))
 //app.use(express.static('public'));
 
 //route to productos
-app.use('/productos', productsRouter);
+app.use('/products', productsRouter);
 
 // Handlebars config
 // const hbs = handlebars.create({
@@ -28,14 +28,12 @@ app.use('/productos', productsRouter);
 //     layoutsDir: __dirname + '/views/layouts/',
 // })
 
-app.engine('handlebars', handlebars.engine)
-
-
+app.engine('handlebars', handlebars.engine())
 app.set('view engine', 'handlebars')
-app.set('views', 'views')
+app.set('views', './views')
 
 
 // Endpoints
 app.get('/', (req, res) => {
-    res.render('form')
+    res.render('create-product')
 })
