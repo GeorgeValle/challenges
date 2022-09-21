@@ -59,7 +59,7 @@ class Contenedor{
             
             // now write in a function
             this.#write(products);
-            return{status:"success", message: `Product  Created`};
+            return product;
 
         }else{
             // product.id=1;
@@ -99,7 +99,7 @@ class Contenedor{
     getAll= async () => {
         if (fs.existsSync(addressJProduct)) {
             let products= await this.#read();
-            return  products;
+            return products;
         } else (err)=>{
             return {status: "error", message: err.message}
         }
