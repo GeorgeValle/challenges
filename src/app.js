@@ -1,4 +1,7 @@
+//server Express
 const express = require('express');
+
+//configuration web socket 
 const {Server}= require('socket-io');
 const handlebars = require('express-handlebars');
 
@@ -23,6 +26,8 @@ app.use(express.urlencoded({ extended:true }));
 
 app.use('/content', express.static('./src/public'))
 
+
+//views client side
 app.engine('handlebars', handlebars.engine())
 app.set('views', __dirname+'/views') // app.set('views', './src/views')
 app.set('view engine', 'handlebars')
@@ -31,9 +36,11 @@ app.get('/', (req, res) => {
     res.render('create-product')
 })
 
+//path to routes
 app.use('/products', productRouter)
 app.use('/chat', chatRouter)
 
+//event connection
 io.on('connection', socket => {
     console.log(`Client ${socket.id} connected...`)
     socket.emit('history', products)
