@@ -1,10 +1,11 @@
 {
   "name": "desafio-12",
   "version": "1.0.0",
-  "description": "",
+  "description": "challenge class 12, chat and product list",
   "main": "index.js",
+  "type":"commonjs",
   "scripts": {
-    "star": "node src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
   "dependencies": {
     "express": "^4.18.1",
     "express-handlebars": "^6.0.6",
+    "nodemon": "^2.0.20",
     "socket.io": "^4.5.2"
   }
 }

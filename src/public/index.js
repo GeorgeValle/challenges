@@ -26,8 +26,7 @@ chatForm.addEventListener('submit', (e) => handleSubmit(e, e.target, '/chat'))
 socket.on('history', data => {
     if (data.length > 0) {
         let history = document.getElementById('history')
-        let html = 
-        `
+        let html = `
         <table class="table">
         <thead>
             <tr>
@@ -38,7 +37,7 @@ socket.on('history', data => {
         </thead>
         <tbody class="table-group-divider">
         `
-        
+
         data.forEach(product => {
             html += `
             <tr>
@@ -62,7 +61,7 @@ socket.on('chatHistory', data => {
         let chatHistory = document.getElementById('chatHistory')
         let html = ''
         data.forEach(message => {
-            html += `
+            html +=`
             <div>
                 <span style="color: blue; font-weight: bold">${message.email}</span>
                 <span style="color: red">[${message.timestamp}]: </span>
