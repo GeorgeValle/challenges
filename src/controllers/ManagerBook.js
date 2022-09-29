@@ -1,5 +1,6 @@
 //call to filesystem
 
+const { error } = require('console');
 const fs=require('fs');
 // save the path to json file
 const addressJProduct='./src/data/products.json';
@@ -93,9 +94,7 @@ class Book{
             return{status:200, message: "Product created", data:product};
 
         }
-
-
-        }catch(err){
+    }catch(err){
             return{status:400, message: err.message}
         }
     }
@@ -109,20 +108,22 @@ class Book{
             let product = products.find(product => product.id === id)
             if (product) return {status: 200,message:"Product found:", data: product}
             return {status: 400, message: "Product not was found"}
-        } catch {
+        } catch (err){
             return {status: 400, message: err.message}
         }
     }
 
 
     getAll= async () => {
-        if (fs.existsSync(addressJProduct)) {
-            let products= await this.#read();
-            return {status: 200,message: "Hello GET ALL", data: products}
-        } else {
-            return {status: 400, message: err.message}
+        
+            if (fs.existsSync(addressJProduct)) {
+                let products= await this.#read();
+                return {status: 200,message: "Hello GET ALL", data: products}         
+            }else{
+                return {status: 400, message: "don't exist Database of Product"}
+            }
         }
-    }
+    
 
     updateById= async (id, product) => {
         //Validations
