@@ -1,4 +1,4 @@
-let products = require('../models/product.model')
+let products = require('../models/product.models')
 
 class ProductManager {
     create = (product) => {

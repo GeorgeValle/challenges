@@ -2,7 +2,7 @@
 const express = require('express');
 
 //configuration web socket 
-const {Server}= require('socket-io');
+const {Server}= require('socket.io');
 const handlebars = require('express-handlebars');
 
 const productRouter = require('./routes/product.router');
