@@ -5,12 +5,18 @@ const router=express.Router();
 const Cart=require('../controllers/ManagerCart');
 const cart = new Cart();
 
-//create a new instance of the managerBook
-router.post('/', async(req, res) => {
-    if(isAdmin) {
-    let create = await cart.save(req.body)
+//create a new instance of the managerCart, Important!: only put id of product book
+router.post('/:id', async(req, res) => {
+    
+    let create = await cart.save(req.params.id)
     res.send(create);
-    }else{res.status(404).send({error: -1, description: `route ${req.baseUrl}${req.url} method ${req.method} not authorized`});}
+    
+})
+
+//get a Cart by identifier
+router.get('/:id', async(req, res) => {
+    let products= await cart.getById(req.params.id);
+    res.send(products);
 })
 
 

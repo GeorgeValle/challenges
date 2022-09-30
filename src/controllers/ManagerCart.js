@@ -36,6 +36,19 @@ class Cart{
         }catch (err){return{status:400, message: err.message}}
         }
 
+        #validationsID= async(id)=>{
+            try{
+                if(!fs.existsSync(addressJProduct)) return {status:400, message:"not existence data base"};
+                let products = await this.#read();
+                id=parseInt(id, 10);
+                if(isNaN(id)) return {status:400, message:"not existence Id. Please, enter only numbers"};
+                if(id<0)return {status:400, message:"not existence Id. Please, enter Id above 0"};
+                if(id>products.length+1) return {status:400, message:"out of range"};
+                return id;
+                    
+            }catch (err){return{status:400, message: err.message}}
+        }
+
     #validationsIDProduct= async(id)=>{
         try{
             if(!fs.existsSync(addressProduct)) return {status:400, message:"not existence data base"};
@@ -49,6 +62,7 @@ class Cart{
         }catch (err){return{status:400, message: err.message}}
     }
 
+
     #validationsProduct= (product) => {
         if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
     }
@@ -56,7 +70,7 @@ class Cart{
     //receive a id of product
     save= async (idProduct) => {
         //validations
-        this.#validationsIDProduct(idProduct);
+        let id_prod = await this.#validationsIDProduct(idProduct);
     
     try{
         
@@ -70,18 +84,19 @@ class Cart{
                 const now = new Date();
                 const timestamp = now.toLocaleString();
                 //read product
-                let product=await book.getById(idProduct);
+                let product=await book.getById(id_prod);
                 let newProduct=product.data;
+                console.log(product);
+                console.log(newProduct);
+                
 
             let cart={
                 id,
                 timestamp,
-                products:{
-                    newProduct
-                    }
+                products:newProduct
                 }
             
-            
+            //cart.products.push(newProduct)
             
             // product= {
             //     id,
@@ -104,13 +119,12 @@ class Cart{
                 let product=await book.getById(idProduct);
                 let newProduct=product.data;
                 
+                
 
-                let cart={
+                let cart= {
                     id:1,
                     timestamp,
-                    products:{
-                        newProduct
-                    }
+                    products:newProduct    
                 }
 
             
@@ -133,12 +147,12 @@ class Cart{
     getById = async (id) => {
         //Validations
         if (!id) return {status: 400, message: "Id required"}
-        id=await this.#validationsID(id);
+        id=await this.#validationsIDProduct(id);
         try{
-            let products = await this.#read();
-            let product = products.find(product => product.id === id)
-            if (product) return {status: 200,message:"Product found:", data: product}
-            return {status: 400, message: "Product not was found"}
+            let carts = await this.#read();
+            let cart = carts.find(cart => cart.id === id)
+            if (cart) return {status: 200,message:"Cart found:", data: cart}
+            return {status: 400, message: "Cart not was found"}
         } catch (err){
             return {status: 400, message: err.message}
         }
