@@ -170,29 +170,40 @@ class Cart{
     //     }
     
 
-    updateById= async (id_cart, product) => {
+    updateById= async (id_cart, id_product) => {
         //Validations
         if (!id_cart) return {status: 400, message: "Id required"}
 
         id= await this.#validationsID(id_cart);
-        await this.#validationsIDProduct(product);
+        id_prod= await this.#validationsIDProduct(id_product);
             try{
                 let carts = await this.#read();
 
                 let elementIndex = carts.findIndex((prod=> prod.id===id));
                     if (elementIndex!==-1){
+
+                        let newProduct=await book.getById(id_prod);
+                        let product=newProduct.data;
+
+                        let products=carts[cartIndex].products
                         
-                        product= {
-                            id,
-                            timestamp,
-                            ...product
+                        products={
+                            product,
+                                ...products
+
                         }
+                        
+                        // product= {
+                        //     id,
+                        //     timestamp,
+                        //     ...product
+                        // }
                     
 
-                        carts[elementIndex]=product;
+                        carts[elementIndex].products=products;
                         await this.#write(carts);
-                        let newUpdate = await this.getById(id);
-                        return {status: 200, message:"cart updated successfully: ", data: newUpdate}
+                        // let newUpdate = await this.getById(id);
+                        return {status: 200, message:"cart updated successfully: ", data: product}
                     }else{ 
                         return {status: 400, message: "Product not was found"}
                         

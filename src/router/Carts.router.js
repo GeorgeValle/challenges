@@ -7,13 +7,15 @@ const cart = new Cart();
 
 //create a new instance of the managerCart, Important!: only put id of product book
 router.get('/', async (req, res) => {
-    
+    let create = await cart.save()
+    res.send(create);
+
 })
 
-router.post('/:id', async(req, res) => {
+router.post('/:id/productos', async(req, res) => {
     
-    let create = await cart.save(req.params.id)
-    res.send(create);
+    let update = await cart.updateById(req.params.id)
+    res.send(update);
     
 })
 
@@ -21,6 +23,14 @@ router.post('/:id', async(req, res) => {
 router.get('/:id', async(req, res) => {
     let products= await cart.getById(req.params.id);
     res.send(products);
+})
+
+//delete by identifier
+router.delete('/:id/productos/:id_prod', async(req, res) => {
+    
+    let result = await cart.deleteById(req.params.id, req.params.id_prod);
+    res.send(result);
+    
 })
 
 
