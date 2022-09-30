@@ -68,9 +68,9 @@ class Cart{
     }
 
     //receive a id of product
-    save= async (idProduct) => {
+    save= async () => {
         //validations
-        let id_prod = await this.#validationsIDProduct(idProduct);
+        //let id_prod = await this.#validationsIDProduct(idProduct);
     
     try{
         
@@ -84,16 +84,15 @@ class Cart{
                 const now = new Date();
                 const timestamp = now.toLocaleString();
                 //read product
-                let product=await book.getById(id_prod);
-                let newProduct=product.data;
-                console.log(product);
-                console.log(newProduct);
+                // let product=await book.getById(id_prod);
+                // let newProduct=product.data;
+                // console.log(product);
+                // console.log(newProduct);
                 
 
             let cart={
                 id,
                 timestamp,
-                products:newProduct
                 }
             
             //cart.products.push(newProduct)
@@ -116,15 +115,15 @@ class Cart{
                 const timestamp = now.toLocaleString();
 
                 //read product
-                let product=await book.getById(idProduct);
-                let newProduct=product.data;
+                // let product=await book.getById(idProduct);
+                // let newProduct=product.data;
                 
                 
 
                 let cart= {
                     id:1,
                     timestamp,
-                    products:newProduct    
+                    // products:newProduct    
                 }
 
             
@@ -147,11 +146,12 @@ class Cart{
     getById = async (id) => {
         //Validations
         if (!id) return {status: 400, message: "Id required"}
-        id=await this.#validationsIDProduct(id);
+
+        id=await this.#validationsID(id);
         try{
             let carts = await this.#read();
             let cart = carts.find(cart => cart.id === id)
-            if (cart) return {status: 200,message:"Cart found:", data: cart}
+            if (cart) return {status: 200,message:"Cart found:", data: cart.products}
             return {status: 400, message: "Cart not was found"}
         } catch (err){
             return {status: 400, message: err.message}
@@ -159,27 +159,29 @@ class Cart{
     }
 
 
-    getAll= async () => {
+    // getAll= async () => {
         
-            if (fs.existsSync(addressJProduct)) {
-                let products= await this.#read();
-                return {status: 200,message: "Hello GET ALL", data: products}         
-            }else{
-                return {status: 400, message: "don't exist Database of Product"}
-            }
-        }
+    //         if (fs.existsSync(addressJProduct)) {
+    //             let products= await this.#read();
+    //             return {status: 200,message: "Hello GET ALL", data: products}         
+    //         }else{
+    //             return {status: 400, message: "don't exist Database of Product"}
+    //         }
+    //     }
     
 
-    updateById= async (id, product) => {
+    updateById= async (id_cart, product) => {
         //Validations
-        if (!id) return {status: 400, message: "Id required"}
-        id= await this.#validationsID(id);
-        this.#validationsProduct(product);
+        if (!id_cart) return {status: 400, message: "Id required"}
+
+        id= await this.#validationsID(id_cart);
+        await this.#validationsIDProduct(product);
             try{
-                let products = await this.#read();
-                let elementIndex = products.findIndex((prod=> prod.id===id));
+                let carts = await this.#read();
+
+                let elementIndex = carts.findIndex((prod=> prod.id===id));
                     if (elementIndex!==-1){
-                        const timestamp=products[elementIndex].timestamp;
+                        
                         product= {
                             id,
                             timestamp,
@@ -187,10 +189,10 @@ class Cart{
                         }
                     
 
-                        products[elementIndex]=product;
-                        await this.#write(products);
+                        carts[elementIndex]=product;
+                        await this.#write(carts);
                         let newUpdate = await this.getById(id);
-                        return {status: 200, message:"product updated successfully: ", data: newUpdate}
+                        return {status: 200, message:"cart updated successfully: ", data: newUpdate}
                     }else{ 
                         return {status: 400, message: "Product not was found"}
                         
@@ -203,31 +205,40 @@ class Cart{
 
     }
 
-    deleteById = async (id) => {
+    deleteById = async (id_cart, id_product) => {
         //Validations
-        if (!id) return {status: 400, message: "Id required"}
-        id= await this.#validationsID(id);
+        if (!id_cart) return {status: 400, message: "Id cart required"};
+        if (!id_product) return {status: 400, message: "Id product required"};
+
+        id= await this.#validationsID(id_cart);
+        id_prod= await this.#validationsIDProduct(id_product);
         try{
-            let products = await this.#read();
+            let carts = await this.#read();
+            let cartIndex = carts.findIndex(cart => cart.id == id);
+
+
+            let newProducts = carts[cartIndex].products.filter(cart => cart.id !== id_prod)
+
+            carts[cartIndex].products=newProducts;
+
+            console.log(carts[cartIndex].product);
             
-            let newProducts = products.filter(product => product.id !== id)
-            
-            await this.#write(newProducts);
+            await this.#write(carts);
             return {status: 200, message: "Product has been DELETED!"}
         }catch{
             return {status: 400, message: err.message}
         }
     }
 
-    deleteAll = async () => {
-        if (fs.existsSync(addressJProduct)) {
+    // deleteAll = async () => {
+    //     if (fs.existsSync(addressJProduct)) {
             
-            await this.#write([]);
-            return {status: 200, message: "Products DELETED!"}
-        } else {
-            return {status: 200, message: err.message}
-        }
-    }
+    //         await this.#write([]);
+    //         return {status: 200, message: "Products DELETED!"}
+    //     } else {
+    //         return {status: 200, message: err.message}
+    //     }
+    // }
 
 
 

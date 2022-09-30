@@ -6,6 +6,10 @@ const Cart=require('../controllers/ManagerCart');
 const cart = new Cart();
 
 //create a new instance of the managerCart, Important!: only put id of product book
+router.get('/', async (req, res) => {
+    
+})
+
 router.post('/:id', async(req, res) => {
     
     let create = await cart.save(req.params.id)
