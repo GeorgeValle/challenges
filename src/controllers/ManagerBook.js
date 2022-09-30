@@ -1,6 +1,5 @@
+//const { error } = require('console');
 //call to filesystem
-
-const { error } = require('console');
 const fs=require('fs');
 // save the path to json file
 const addressJProduct='./src/data/products.json';
@@ -15,13 +14,13 @@ class Book{
             let data= await fs.promises.readFile(addressJProduct,'utf-8');
             return JSON.parse(data);
             
-        }catch (err){console.error(err)}
+        }catch (err){return{status:400, message: err.message}}
     }
 
     #write= async(products)=>{
         try{
             await fs.promises.writeFile(addressJProduct, JSON.stringify(products,null,2))
-        }catch (err){console.error(err)}
+        }catch (err){return{status:400, message: err.message}}
         }
 
     #validationsID= async(id)=>{
@@ -170,7 +169,7 @@ class Book{
             await this.#write(newProducts);
             return {status: 200, message: "Product has been DELETED!"}
         }catch{
-            return {status: 400, message: err.message}
+            return {status: 400, message: "Delete failed!"}
         }
     }
 
@@ -180,7 +179,7 @@ class Book{
             await this.#write([]);
             return {status: 200, message: "Products DELETED!"}
         } else {
-            return {status: 200, message: err.message}
+            return {status: 200, message: "Delete all failed!"}
         }
     }
 
