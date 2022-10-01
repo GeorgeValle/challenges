@@ -13,14 +13,17 @@ router.post('/', async (req, res) => {
 })
 
 router.post('/:id/productos/:id_prod', async(req, res) => {
+
+    let product= await cart.getProduct(req.params.id_prod);
     
-    let update = await cart.updateById(req.params.id,req.params.id_prod)
+    let update = await cart.updateById(req.params.id,product);
     res.send(update);
     
 })
 
 //get a Cart by identifier
 router.get('/:id', async(req, res) => {
+    
     let products= await cart.getById(req.params.id);
     res.send(products);
 })

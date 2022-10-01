@@ -93,9 +93,7 @@ class Cart{
             let cart={
                 id,
                 timestamp,
-                products:{
-
-                }
+                products:[]
 
                 }
             
@@ -127,9 +125,7 @@ class Cart{
                 let cart= {
                     id:1,
                     timestamp,
-                    products:{
-
-                    }    
+                    products:[]    
                 }
 
             
@@ -176,52 +172,54 @@ class Cart{
     //     }
     
 
-    updateById= async (id_cart, id_product) => {
+    getProduct= async (id_product) => {
+        if (!id_product) return {status: 400, message: "Id required"}
+        let id_prod= await this.#validationsIDProduct(id_product);
+        try{
+        let newProduct=await book.getById(id_prod);
+                        let product=newProduct.data;
+                        return product;
+        }catch (err){return{status:400, message: err.message}}
+    }
+
+
+    updateById= async (id_cart, product) => {
         //Validations
         if (!id_cart) return {status: 400, message: "Id required"}
 
         let id= await this.#validationsID(id_cart);
-        let id_prod= await this.#validationsIDProduct(id_product);
+        //let id_prod= await this.#validationsIDProduct(id_product);
             try{
                 let carts = await this.#read();
 
-                let elementIndex = carts.findIndex((prod=> prod.id===id));
-                    if (elementIndex!==-1){
+                //carts not chosen
+                const othersCarts =  carts.filter(elem=> elem.id!=id);
+                //cart chosen
+                let cart=  carts.find(elem=> elem.id==id);
+                
+                
+                
+                if(cart){
 
-                        let newProduct=await book.getById(id_prod);
-                        let product=newProduct.data;
-
-                        //let products=carts[elementIndex].products
-                        const timestamp=carts[elementIndex].timestamp;
-                        let productsTemp= carts[elementIndex].products;
-
-
-                        productsTemp={
-                            product,
-                            ...productsTemp
-                        }
-
-
-                        carts[elementIndex]={
-                            id,
-                            timestamp,
-                            products:{
-                                productsTemp
-                            }
-
-                        }
-                        
-                        // product= {
-                        //     id,
-                        //     timestamp,
-                        //     ...product
-                        // }
                     
-
+                    
+                    //transform because not is possibly cart.products.push(product);
+                    let carrito =cart
+                    
+                    //push the param product 
+                    carrito.products.push(product);
+                    
+                    //order the products
+                    carrito.products.sort((a,b)=>a.id - b.id);
+                    //push the cart updated in the filter
+                    let cartList=othersCarts
+                    cartList.push(carrito);
+                    //order the filter
+                    cartList.sort((a,b)=>a.id - b.id);
+                        //push to file
+                        await this.#write(cartList);
                         
-                        await this.#write(carts);
-                        // let newUpdate = await this.getById(id);
-                        return {status: 200, message:"cart updated successfully: ", data: product}
+                        return {status: 200, message:"Cart updated successfully: ", data: product}
                     }else{ 
                         return {status: 400, message: "Product not was found"}
                         
@@ -243,17 +241,32 @@ class Cart{
         let id_prod= await this.#validationsIDProduct(id_product);
         try{
             let carts = await this.#read();
-            let cartIndex = carts.findIndex(cart => cart.id == id);
 
-
-            let newProducts = carts[cartIndex].products.filter(cart => cart.id !== id_prod)
-
-            carts[cartIndex].products=newProducts;
-
-            console.log(carts[cartIndex].product);
+            //carts not chosen
+            const othersCarts = await carts.filter(elem=> elem.id!=id);
             
-            await this.#write(carts);
-            return {status: 200, message: "Product has been DELETED!"}
+            //cart chosen
+            const cart=  await carts.find(elem=> elem.id==id);
+            if(cart){
+                let carrito=cart
+            let cartChosen= await carrito;
+
+            console.log(cartChosen);
+            //filter products not chosen
+            const restProducts=cartChosen.filter(elem=> elem.id!=id_prod);
+            console.log(restProducts);
+            //product for delete
+            const productDeleted=cartChosen.find(elem=> elem.id==id_prod);
+
+            cartChosen.products.push(restProducts);
+            cartChosen.products.sort((a, b) => a.id - b.id);
+            const cartList =othersCarts;
+            cartList.push(cartChosen);
+            cartList.sort((a, b) => a.id - b.id);
+
+            await this.#write(cartList);
+            }else{return{status: 400, message: "product not was found"}}
+            return {status: 200, message: "Product has been DELETED!", data: productDeleted}
         }catch(err){
             return {status: 400, message: err.message}
         }
