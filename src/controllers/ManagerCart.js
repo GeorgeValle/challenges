@@ -56,16 +56,16 @@ class Cart{
             id=parseInt(id, 10);
             if(isNaN(id)) return {status:400, message:"not existence Id. Please, enter only numbers"};
             if(id<0)return {status:400, message:"not existence Id. Please, enter Id above 0"};
-            if(id>products.length+1) return {status:400, message:"out of range"};
+            if(id>products.length) return {status:400, message:"out of range"};
             return id;
                 
         }catch (err){return{status:400, message: err.message}}
     }
 
 
-    #validationsProduct= (product) => {
-        if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
-    }
+    // #validationsProduct= (product) => {
+    //     if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
+    // }
 
     //receive a id of product
     save= async () => {
@@ -93,6 +93,10 @@ class Cart{
             let cart={
                 id,
                 timestamp,
+                products:{
+
+                }
+
                 }
             
             //cart.products.push(newProduct)
@@ -123,7 +127,9 @@ class Cart{
                 let cart= {
                     id:1,
                     timestamp,
-                    // products:newProduct    
+                    products:{
+
+                    }    
                 }
 
             
@@ -174,8 +180,8 @@ class Cart{
         //Validations
         if (!id_cart) return {status: 400, message: "Id required"}
 
-        id= await this.#validationsID(id_cart);
-        id_prod= await this.#validationsIDProduct(id_product);
+        let id= await this.#validationsID(id_cart);
+        let id_prod= await this.#validationsIDProduct(id_product);
             try{
                 let carts = await this.#read();
 
@@ -185,11 +191,23 @@ class Cart{
                         let newProduct=await book.getById(id_prod);
                         let product=newProduct.data;
 
-                        let products=carts[cartIndex].products
-                        
-                        products={
+                        //let products=carts[elementIndex].products
+                        const timestamp=carts[elementIndex].timestamp;
+                        let productsTemp= carts[elementIndex].products;
+
+
+                        productsTemp={
                             product,
-                                ...products
+                            ...productsTemp
+                        }
+
+
+                        carts[elementIndex]={
+                            id,
+                            timestamp,
+                            products:{
+                                productsTemp
+                            }
 
                         }
                         
@@ -200,7 +218,7 @@ class Cart{
                         // }
                     
 
-                        carts[elementIndex].products=products;
+                        
                         await this.#write(carts);
                         // let newUpdate = await this.getById(id);
                         return {status: 200, message:"cart updated successfully: ", data: product}
@@ -221,8 +239,8 @@ class Cart{
         if (!id_cart) return {status: 400, message: "Id cart required"};
         if (!id_product) return {status: 400, message: "Id product required"};
 
-        id= await this.#validationsID(id_cart);
-        id_prod= await this.#validationsIDProduct(id_product);
+        let id= await this.#validationsID(id_cart);
+        let id_prod= await this.#validationsIDProduct(id_product);
         try{
             let carts = await this.#read();
             let cartIndex = carts.findIndex(cart => cart.id == id);
@@ -236,7 +254,7 @@ class Cart{
             
             await this.#write(carts);
             return {status: 200, message: "Product has been DELETED!"}
-        }catch{
+        }catch(err){
             return {status: 400, message: err.message}
         }
     }
