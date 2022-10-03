@@ -59,9 +59,6 @@ class Book{
                 product.stock= parseInt(product.stock)
                 product.code= parseInt(product.code)
                 
-            
-            
-            
             product= {
                 id,
                 timestamp,
@@ -69,7 +66,6 @@ class Book{
             }
             products.push(product);
 
-            
             //now write whit private function
             await this.#write(products);
             return{status:200, message: `Product  Created`, data:product};
@@ -112,7 +108,6 @@ class Book{
         }
     }
 
-
     getAll= async () => {
         
             if (fs.existsSync(addressJProduct)) {
@@ -123,7 +118,6 @@ class Book{
             }
         }
     
-
     updateById= async (id, product) => {
         //Validations
         if (!id) return {status: 400, message: "Id required"}
@@ -140,7 +134,6 @@ class Book{
                             ...product
                         }
                     
-
                         products[elementIndex]=product;
                         await this.#write(products);
                         let newUpdate = await this.getById(id);
@@ -151,10 +144,7 @@ class Book{
                     }
                     
 
-            }catch(err){
-                return{status:400, message: err.message};
-            }
-
+            }catch(err){return{status:400, message: err.message} }
     }
 
     deleteById = async (id) => {
@@ -183,10 +173,5 @@ class Book{
         }
     }
 
-
-
-
 }
-
-
 module.exports = Book;

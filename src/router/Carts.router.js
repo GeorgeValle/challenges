@@ -28,6 +28,14 @@ router.get('/:id', async(req, res) => {
     res.send(products);
 })
 
+//delete a Cart by identifier
+router.delete('/:id', async(req, res) => {
+    
+    let result = await cart.deleteCart(req.params.id);
+    res.send(result);
+    
+})
+
 //delete by identifier
 router.delete('/:id/productos/:id_prod', async(req, res) => {
     
