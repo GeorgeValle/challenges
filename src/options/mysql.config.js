@@ -6,4 +6,5 @@ const options = {
         database: "chat_websocket"
     }
 }
+
 module.exports= options;
