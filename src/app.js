@@ -1,6 +1,9 @@
 //server Express
 const express = require('express');
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 //configuration web socket 
 const {Server}= require('socket.io');
 const handlebars = require('express-handlebars');
