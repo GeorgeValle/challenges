@@ -1,21 +1,30 @@
-let products = require('../models/product.models')
+//let products = require('../models/product.models')
+
+const knex = require('knex');
 
 class ProductManager {
-    create = (product) => {
-        let id
-        if (products.length === 0) id = 1
-        else id = products[products.length-1].id+1
-        product.price = parseInt(product.price)
-        product = {
-            id,
-            ...product
-        }
-        products.push(product)
-        return products
+
+    constructor(bd,table) {
+
+        this.db=bd;
+        this.table=table;
+    }
+
+
+
+    async create(product){
+        
+        await this.db(this.table).insert(product)
+        return {status : 200, message: 'Product added successfully'}
     }
 
     findAll = () => {
-        return products
+    
+        return this.db(this.table)
+        .where({})
+        .select("id","title","price","thumbnail")
+        
+        
     }
 
     findById = (id) => {
