@@ -11,7 +11,9 @@ const handlebars = require('express-handlebars');
 const productRouter = require('./routes/product.router');
 const chatRouter = require('./routes/chat.router');
 
-let products= require('./models/product.models');
+const createTables = require('./options/createTables')
+
+let productsList= require('./models/product.models');
 
 // class
 const Manager = require('./controllers/chat.manager');
@@ -19,8 +21,20 @@ const manager = new Manager();
 
 const app = express();
 const PORT = process.env.PORT||8080;
+const tbl_Products ="products";
+const tbl_table = "chat";
 
-const server = app.listen(PORT,()=> console.log(`listening on port ${PORT}`))
+const server = app.listen(PORT, async ()=>{
+    console.log(`listening on port ${PORT}`)
+
+try{
+    await createTables(tbl_Products, tbl_table)
+    console.log('Databases created!')
+}catch {
+    console.log('Error in databases tables creation')
+}
+})
+
 const io = new Server(server);
 
 app.use(express.json());
@@ -48,7 +62,7 @@ app.use('/chat', chatRouter)
 io.on('connection', socket => {
     console.log(`Client ${socket.id} connected...`)
     //send product list 
-    socket.emit('history', products)
+    socket.emit('history', productsList)
     manager.findAll().then(result => socket.emit('chatHistory', result))
     socket.on('products', data => {
         io.emit('history', data)

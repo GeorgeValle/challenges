@@ -1,6 +1,7 @@
 //let products = require('../models/product.models')
 
-const knex = require('knex');
+//const {MySQLOptions} = require('../options/mysql.config');
+//const knex = require('knex');
 
 class ProductManager {
 
@@ -15,7 +16,7 @@ class ProductManager {
     async create(product){
         
         await this.db(this.table).insert(product)
-        return {status : 200, message: 'Product added successfully'}
+        
     }
 
     findAll = () => {
@@ -27,30 +28,26 @@ class ProductManager {
         
     }
 
-    findById = (id) => {
-        id = parseInt(id)
-        return products.find(item => item.id === id)
+    async findById(params){
+        id = parseInt(params)
+        // return products.find(item => item.id === id)
+        return await this.db(this.table)
+        .where(id)
+        .select("id","title","price","thumbnail")
     }
 
-    update = (id, product) => {
-        id = parseInt(id)
-        let newProducts = products.map(item => {
-            if (item.id === id) {
-                return {
-                    id,
-                    ...product
-                }
-            } else return item
-        })
-        products = newProducts
+    async update(params, product){
+        id = parseInt(params)
+        await this.db(this.table)
+        .where(id)
+        .update(product)
         return this.findById(id)
     }
 
-    delete = (id) => {
-        id = parseInt(id)
-        let newProducts = products.filter(item => item.id !== id)
-        products = newProducts
-        return products
+    async delete(params){
+        id = parseInt(params)
+        await this.db(this.table).where(id).del()
+        
     }
 }
 

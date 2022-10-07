@@ -1,4 +1,5 @@
-const {MySQLOptions,SQLOptions} = require('./mysql.config');
+const MySQLOptions = require('./mysql.config');
+const SQLOptions = require('./sqlite.config');
 const knex = require ('knex');
 
 const myDB = knex(MySQLOptions);
@@ -10,9 +11,9 @@ const createTables= async( myTable,liteTable)=>{
         if(!await myDB.schema.hasTable(myTable)){
             await myDB.schema.createTable(liteTable, table => {
                 table.increments('id')
-                table.string('title')
-                table.float('price')
-                table.string('thumbnail')
+                table.string('title').nullable(false)
+                table.float('price').nullable(false)
+                table.string('thumbnail').nullable(false)
             })
             message = `Table ${myTable} created - `
         }

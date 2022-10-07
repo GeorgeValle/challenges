@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
 
+const {MySQLOptions} = require('../options/mysql.config')
+
 const Manager = require('../controllers/product.manager')
-const manager = new Manager()
+const manager = new Manager(MySQLOptions)
 
 router.get('/', (req, res) => {
     let result = manager.findAll()
