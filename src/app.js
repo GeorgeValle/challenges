@@ -14,31 +14,32 @@ const chatRouter = require('./routes/chat.router');
 const createTables = require('./options/createTables')
 
 let productsList= require('./models/product.models');
-
-const mysql = require('./options/mysql.config')
+//object knex for db sqlite
+const sqlite = require('./options/sqlite.config')
 
 
 
 const app = express();
 const PORT = process.env.PORT||8080;
+
 const tbl_Products ="products";
-const tbl_table = "chats";
+const tbl_chats = "chats";
 
 const server = app.listen(PORT, async ()=>{
     console.log(`listening on port ${PORT}`)
     // process.env.T_PRODUCTS
     // console.log(process.env.T_PRODUCTS);//console
 try{
-    await createTables(tbl_Products, tbl_table)
+    await createTables(tbl_Products, tbl_chats)
     console.log('Databases was created!')
 }catch {
     console.log('Error in databases tables creation')
 }
 })
 
-// class
+// class chat
 const Manager = require('./controllers/chat.manager');
-const manager = new Manager(mysql,tbl_Products);
+const manager = new Manager(sqlite,tbl_chats);
 
 const io = new Server(server);
 

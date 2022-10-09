@@ -26,34 +26,38 @@ class ProductManager {
         
     }
 
-    findAll = () => {
+    async findAll(){
     
-        return this.db(this.table)
-        .where({})
-        .select("id","title","price","thumbnail")
+        let result=JSON.parse(JSON.stringify(
+            await this.db(this.table)
+            .where({})
+            .select("id","title","price","thumbnail")))
         
-        
+        return result; 
     }
 
     async findById(params){
         id = parseInt(params)
         // return products.find(item => item.id === id)
-        return await this.db(this.table)
-        .where(id)
-        .select("id","title","price","thumbnail")
+        let result=JSON.parse(JSON.stringify(
+            await this.db(this.table)
+            .where('id',id)
+            .select("id","title","price","thumbnail")))
+            
+        return result;
     }
 
     async update(params, product){
         id = parseInt(params)
         await this.db(this.table)
-        .where(id)
+        .where('id',id)
         .update(product)
-        return this.findById(id)
+        return await this.findById(id)
     }
 
     async delete(params){
         id = parseInt(params)
-        await this.db(this.table).where(id).del()
+        await this.db(this.table).where('id',id).del()
         
     }
 }

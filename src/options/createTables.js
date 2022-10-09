@@ -1,15 +1,13 @@
-const MySQLOptions = require('./mysql.config');
-const SQLOptions = require('./sqlite.config');
-const knex = require ('knex');
-
-const myDB = knex(MySQLOptions);
-const liteDB = knex(SQLOptions);
+//objet Knex mysql client
+const myDB = require('./mysql.config');
+//objet Knex sqlite client
+const liteDB = require('./sqlite.config');
 
 const createTables= async( myTable,liteTable)=>{
     try{
         let message = ''
         if(!await myDB.schema.hasTable(myTable)){
-            await myDB.schema.createTable(liteTable, table => {
+            await myDB.schema.createTable(myTable, table => {
                 table.increments('id')
                 table.string('title').nullable(false)
                 table.float('price').nullable(false)
@@ -31,10 +29,10 @@ const createTables= async( myTable,liteTable)=>{
     }catch (err){
         throw {status : 'Error', result : {msg : err.message, code : err.code}}
     }finally{
+        //destroy tables connection
         myDB.destroy()
         liteDB.destroy()
     }
 }
-
 
 module.exports = createTables;

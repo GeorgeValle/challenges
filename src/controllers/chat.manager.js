@@ -1,6 +1,6 @@
-const fs = require('fs')
+// const fs = require('fs')
 
-const pathToFile = './chat.json'
+// const pathToFile = './chat.json'
 
 class ChatManager {
 
@@ -9,7 +9,7 @@ class ChatManager {
         this.table=table;
     };
 
-    create = async (message) => {
+    async create(message){
         try {
             
                 
@@ -26,9 +26,11 @@ class ChatManager {
         }
     }
 
-    findAll = async () => {
-        let chat;
-        return chat = await this.db(this.table).where({}).select("email","msg","date")||[]
+    async findAll(){
+        let chat= result=JSON.parse(JSON.stringify(
+        await this.db(this.table).where({}).select("email","msg","date")))
+        ||[];
+        return chat; 
     }
 }
 

@@ -26,6 +26,7 @@ router.get('/:id', async(req, res) => {
 
 router.post('/', async(req, res) => {
     try{
+
     if (!req.body.title || !req.body.price || !req.body.thumbnail) return res.send({error: 'data is required'})
     const product = ({title, price, thumbnail}=req.body);
     let result = await manager.create(product)
@@ -38,6 +39,7 @@ router.post('/', async(req, res) => {
 router.put('/:id', async(req, res) => {
     try{
     if (!req.body.title || !req.body.price || !req.body.thumbnail) return res.send({error: 'data is required'})
+    
     const product = ({title, price, thumbnail}=req.body)
     let result = await manager.update(req.params.id, product)
     if (!result) return res.send({error: 'product was not found'})
@@ -55,4 +57,4 @@ finally{(()=>mysql.destroy())}
 
 })
 
-module.exports = router
+module.exports = router;

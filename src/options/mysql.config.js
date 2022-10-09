@@ -14,4 +14,4 @@ const MySQLOptions =require("knex")( {
 
 
 
-module.exports= {MySQLOptions};
+module.exports= MySQLOptions;
