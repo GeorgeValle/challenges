@@ -6,12 +6,14 @@ const express = require('express');
 
 //configuration web socket 
 const {Server}= require('socket.io');
+
 const handlebars = require('express-handlebars');
 
 const productRouter = require('./routes/product.router');
 const chatRouter = require('./routes/chat.router');
 
-const createTables = require('./options/createTables')
+const createTable1 = require('./options/createTable1');
+const createTable2 = require('./options/createTable2');    
 
 let productsList= require('./models/product.models');
 //object knex for db sqlite
@@ -27,10 +29,16 @@ const tbl_chats = "chats";
 
 const server = app.listen(PORT, async ()=>{
     console.log(`listening on port ${PORT}`)
-    // process.env.T_PRODUCTS
-    // console.log(process.env.T_PRODUCTS);//console
+    //table whit MySQl
 try{
-    await createTables(tbl_Products, tbl_chats)
+    await createTable1(tbl_Products)
+    console.log('Databases was created!')
+}catch {
+    console.log('Error in databases tables creation')
+}
+//Table whit sqlLite
+try{
+    await createTable2(tbl_chats)
     console.log('Databases was created!')
 }catch {
     console.log('Error in databases tables creation')

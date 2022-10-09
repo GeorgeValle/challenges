@@ -2,7 +2,7 @@
 let SQLOptions= require("knex")({
     client:process.env.DB_HOST_II||'sqlite3',
     connection:{
-        filename: ":/src/DB/ecommerce.sqlite3",
+        filename: "./src/DB/ecommerce.sqlite3",
     },
     useNullAsDefault: true
 })

@@ -1,6 +1,21 @@
-#Pasos Hechos (spanish)#
+# Pasos Hechos (spanish) 
 
-##Creación de objeto Knex y tablas##
+## Dependencias
+```javascript
+"dependencies": {
+    "express": "^4.18.1",
+    "express-handlebars": "^6.0.6",
+    "knex": "^2.3.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "socket.io": "^4.5.2",
+    "sqlite3": "^5.1.2"
+  }
+```
+
+
+
+## Creación de objeto Knex y tablas
 * se creó el script options ya instanciando un objeto knex para dar los métodos a cualquier parte que se exporte tanto MySQL como SQLITE.
 
 
@@ -25,7 +40,7 @@ module.exports= MySQLOptions;
 let SQLOptions= require("knex")({
     client:process.env.DB_HOST_II||'sqlite3',
     connection:{
-        filename: ":/src/DB/ecommerce.sqlite3",
+        filename: "./src/DB/ecommerce.sqlite3",
     },
     useNullAsDefault: true
 })
@@ -33,15 +48,14 @@ let SQLOptions= require("knex")({
 module.exports= SQLOptions;
 ```
 
-* se creó el script que genera las bases de datos al que se le añadió el objeto knex y un nombre específico de tabla, en estos casos, **products** para products y **chats** para los chats. Al ejecutar el app.js se crean ambas tablas
+* se creron 2 script que generan las bases de datos al que se le añadió el objeto knex y un nombre específico de tabla, en estos casos, **products** para products y **chats** para los chats. Al ejecutar el app.js se crean ambas tablas
+
 
 ```javascript
 //objet Knex mysql client
 const myDB = require('./mysql.config');
-//objet Knex sqlite client
-const liteDB = require('./sqlite.config');
 
-const createTables= async( myTable,liteTable)=>{
+const createTable1= async( myTable)=>{
     try{
         let message = ''
         if(!await myDB.schema.hasTable(myTable)){
@@ -54,29 +68,46 @@ const createTables= async( myTable,liteTable)=>{
             message = `Table ${myTable} created - `
         }
 
-        if(!await liteDB.schema.hasTable(liteTable)){
-            await liteDB.schema.createTable(liteTable, table => {
-                table.increments('id')
-                table.string('email')
-                table.string('msg')
-                table.time('date')
-            })
-            message += `Table ${liteTable} created`
-        }
         return {status: 'success', result: message}
     }catch (err){
         throw {status : 'Error', result : {msg : err.message, code : err.code}}
     }finally{
         //destroy tables connection
         myDB.destroy()
-        liteDB.destroy()
     }
 }
 
-module.exports = createTables;
+module.exports = createTable1;
 ```
 
-##Creación de las tablas en script app.js##
+```javascript	
+//objet Knex sqlite client
+const liteDB = require('./sqlite.config');
+
+const createTable2= async( liteTable)=>{
+    try{
+    if(!await liteDB.schema.hasTable(liteTable)){
+        await liteDB.schema.createTable(liteTable, table => {
+            table.increments('id')
+            table.string('email')
+            table.string('msg')
+            table.time('date')
+        })
+        message += `Table ${liteTable} created`
+    }
+    return {status: 'success', result: message}
+}catch (err){
+    throw {status : 'Error', result : {msg : err.message, code : err.code}}
+}finally{
+    //destroy tables connection
+    liteDB.destroy()}
+}
+
+module.exports = createTable2;
+```
+
+
+## Creación de las tablas en script app.js
 
 * se crean dos variables con strings de los nombres de las tablas dentro de la base de datos. La creación de tablas es instanciada en la misma creación del servidor.
 
@@ -86,9 +117,16 @@ const tbl_chats = "chats";
 
 const server = app.listen(PORT, async ()=>{
     console.log(`listening on port ${PORT}`)
-    
+    //table whit MySQl
 try{
-    await createTables(tbl_Products, tbl_chats)
+    await createTable1(tbl_Products)
+    console.log('Databases was created!')
+}catch {
+    console.log('Error in databases tables creation')
+}
+//Table whit sqlLite
+try{
+    await createTable2(tbl_chats)
     console.log('Databases was created!')
 }catch {
     console.log('Error in databases tables creation')
@@ -97,7 +135,7 @@ try{
 ```
 
 
-##Creación del controller product##
+## Creación del controller product##
 
 1.creación del constructor al cual se le pasa una base de datos, en este caso el objeto knex, y el nombre de la tabla que se ejecutarán las busquedas en los metodos del objetos knex.
 
@@ -275,7 +313,7 @@ let productsList = manager.findAll()
 module.exports = productsList;
 ```
 
-##Creación del creación del controller chat##
+## Creación del creación del controller chat
 
 * creación del constructor de la clase Chat, que recibe un objeto knex con la configuración de la base de datos sqlite.
 
@@ -368,6 +406,34 @@ let chat = manager.findAll()
 
 module.exports = chat;
 ```
+
+## Evento socket.io
+
+* evento para conectar el chat.
+
+En la cabecera de App.js:
+```javascript
+//configuration web socket 
+const {Server}= require('socket.io');
+const io = new Server(server);
+```
+
+```javascript
+//event connection
+io.on('connection', socket => {
+    console.log(`Client ${socket.id} connected...`)
+    //send product list 
+    socket.emit('history', productsList)
+    manager.findAll().then(result => socket.emit('chatHistory', result))
+    socket.on('products', data => {
+        io.emit('history', data)
+    })
+    socket.on('chat', data => {
+        io.emit('chatHistory', data)
+    })
+})
+```
+
 
 
 

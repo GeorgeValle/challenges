@@ -4,7 +4,7 @@ const router = express.Router()
 const mysql = require('../options/mysql.config')
 
 const Manager = require('../controllers/product.manager')
-const manager = new Manager(mysql,products)
+const manager = new Manager(mysql,"products")
 
 router.get('/', async(req, res) => {
     try{
