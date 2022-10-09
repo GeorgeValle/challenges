@@ -7,4 +7,4 @@ let SQLOptions= require("knex")({
     useNullAsDefault: true
 })
 
-module.exports= {SQLOptions};
+module.exports= SQLOptions;

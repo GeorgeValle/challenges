@@ -8,10 +8,14 @@ const Manager = require('../controllers/chat.manager')
 const manager = new Manager(sqlite,tbl_table)
 
 router.get('/', (req, res) => {
+    try{
     manager.findAll().then(result => res.send(result))
+    }catch{(err=>console.log(err))}
+    finally{(()=>mysql.destroy())}
 })
 
 router.post('/', (req, res) => {
+    try{
     if (!req.body.email || !req.body.message) return res.send({error: 'data is required'})
     // create the new objet `Date`
     const now = new Date();
@@ -22,10 +26,9 @@ router.post('/', (req, res) => {
         msg,
         date
     }
-
-
-
     manager.create(message).then(result => res.send(result))
+    }catch{(err=>console.log(err))}
+    finally{(()=>mysql.destroy())}
 })
 
 module.exports = router

@@ -15,6 +15,13 @@ class ProductManager {
 
     async create(product){
         
+        
+        product={
+            title: product.title,
+            price: product.price,
+            thumbnail: product.thumbnail
+        }
+        
         await this.db(this.table).insert(product)
         
     }
