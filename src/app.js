@@ -1,8 +1,8 @@
 //server Express
 const express = require('express');
 
-const dotenv = require('dotenv');
-dotenv.config();
+// const dotenv = require('dotenv');
+// dotenv.config({path: './'});
 
 //configuration web socket 
 const {Server}= require('socket.io');
@@ -15,25 +15,30 @@ const createTables = require('./options/createTables')
 
 let productsList= require('./models/product.models');
 
-// class
-const Manager = require('./controllers/chat.manager');
-const manager = new Manager();
+const mysql = require('./options/mysql.config')
+
+
 
 const app = express();
 const PORT = process.env.PORT||8080;
 const tbl_Products ="products";
-const tbl_table = "chat";
+const tbl_table = "chats";
 
 const server = app.listen(PORT, async ()=>{
     console.log(`listening on port ${PORT}`)
-
+    // process.env.T_PRODUCTS
+    // console.log(process.env.T_PRODUCTS);//console
 try{
     await createTables(tbl_Products, tbl_table)
-    console.log('Databases created!')
+    console.log('Databases was created!')
 }catch {
     console.log('Error in databases tables creation')
 }
 })
+
+// class
+const Manager = require('./controllers/chat.manager');
+const manager = new Manager(mysql,tbl_Products);
 
 const io = new Server(server);
 

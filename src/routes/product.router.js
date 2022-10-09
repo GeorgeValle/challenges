@@ -19,13 +19,15 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
     if (!req.body.title || !req.body.price || !req.body.thumbnail) return res.send({error: 'data is required'})
-    let result = manager.create(req.body)
+    const product = ({title, price, thumbnail}=req.body);
+    let result = manager.create(product)
     res.send(result)
 })
 
 router.put('/:id', (req, res) => {
     if (!req.body.title || !req.body.price || !req.body.thumbnail) return res.send({error: 'data is required'})
-    let result = manager.update(req.params.id, req.body)
+    const product = ({title, price, thumbnail}=req.body)
+    let result = manager.update(req.params.id, product)
     if (!result) return res.send({error: 'product was not found'})
     res.send(result)
 })

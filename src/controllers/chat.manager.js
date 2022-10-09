@@ -3,6 +3,12 @@ const fs = require('fs')
 const pathToFile = './chat.json'
 
 class ChatManager {
+
+    constructor(bd,table) {
+        this.db=bd;
+        this.table=table;
+    };
+
     create = async (message) => {
         try {
             if (fs.existsSync(pathToFile)) {
