@@ -11,8 +11,6 @@ class ChatManager {
 
     async create(message){
         try {
-            
-                
                 message = {
                     email: message.email,
                     timestamp: new Date().toLocaleString(),

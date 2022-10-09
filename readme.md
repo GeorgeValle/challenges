@@ -1,7 +1,7 @@
-#Pasos Hechos (spanish)
+#Pasos Hechos (spanish)#
 
-##Creación de objeto Knex y tablas
-1. se creó el script options ya instanciando un objeto knex para dar los métodos a cualquier parte que se exporte tanto MySQL como SQLITE.
+##Creación de objeto Knex y tablas##
+* se creó el script options ya instanciando un objeto knex para dar los métodos a cualquier parte que se exporte tanto MySQL como SQLITE.
 
 
 ```javascript
@@ -33,7 +33,7 @@ let SQLOptions= require("knex")({
 module.exports= SQLOptions;
 ```
 
-1. se creó el script que genera las bases de datos al que se le añadió el objeto knex y un nombre específico de tabla, en estos casos, **products** para products y **chats** para los chats. Al ejecutar el app.js se crean ambas tablas
+* se creó el script que genera las bases de datos al que se le añadió el objeto knex y un nombre específico de tabla, en estos casos, **products** para products y **chats** para los chats. Al ejecutar el app.js se crean ambas tablas
 
 ```javascript
 //objet Knex mysql client
@@ -76,9 +76,9 @@ const createTables= async( myTable,liteTable)=>{
 module.exports = createTables;
 ```
 
-##Creación de las tablas en script app.js
+##Creación de las tablas en script app.js##
 
-1. se crean dos variables con strings de los nombres de las tablas dentro de la base de datos. La creación de tablas es instanciada en la misma creación del servidor.
+* se crean dos variables con strings de los nombres de las tablas dentro de la base de datos. La creación de tablas es instanciada en la misma creación del servidor.
 
 ```javascript
 const tbl_Products ="products";
@@ -96,7 +96,8 @@ try{
 })
 ```
 
-##creación de controllers product
+
+##Creación del controller product##
 
 1.creación del constructor al cual se le pasa una base de datos, en este caso el objeto knex, y el nombre de la tabla que se ejecutarán las busquedas en los metodos del objetos knex.
 
@@ -109,7 +110,7 @@ class ProductManager {
         this.table=table;
     }
 ```
-1. creación del método create, que ingresa un producto en la tabla, recibe un objeto preparado desde el product.router y *para mayor seguridad* se lo desestructura para que ingrese en la misma ubicación como pide la tabla.
+* creación del método create, que ingresa un producto en la tabla, recibe un objeto preparado desde el product.router y *para mayor seguridad* se lo desestructura para que ingrese en la misma ubicación como pide la tabla.
 
 [!NOTE] Desde el Router
 
@@ -144,7 +145,7 @@ router.post('/', async(req, res) => {
     }
 ```
 
-1. creación del método ``findAll()``, que busca a todos los productos de la base de datos (al cololcar un objeto vacio trae todos los objetos). y se convierte el dato recibído de la BD a json para retornarlo ya transformado al router.product. 
+* creación del método ``findAll()``, que busca a todos los productos de la base de datos (al cololcar un objeto vacio trae todos los objetos). y se convierte el dato recibído de la BD a json para retornarlo ya transformado al router.product. 
 
 [!NOTE] En el controller
 
@@ -171,7 +172,7 @@ router.get('/', async(req, res) => {
 })
 ```
 
-1. creación del método ``findById()``, el cual retorna un producto específico, tras haber recibido un id desde el router.product.
+* creación del método ``findById()``, el cual retorna un producto específico, tras haber recibido un id desde el router.product.
 
 [!NOTE] En el controller
 
@@ -201,7 +202,7 @@ router.get('/:id', async(req, res) => {
 })
 ```
 
-1. creación del método ``update()``, el cual actualiza un producto recibiendo del router.product un id y los datos actualizados.
+* creación del método ``update()``, el cual actualiza un producto recibiendo del router.product un id y los datos actualizados.
 
 [!NOTE] Desde el Router
 
@@ -230,7 +231,7 @@ async update(params, product){
         return await this.findById(id)
     }
 ```
-1. creación del método ``delete()``, el cual borra un producto específico mediante id enviado desde el router.product. 
+* creación del método ``delete()``, el cual borra un producto específico mediante un id, enviado desde el router.product . 
 
 [!NOTE] Desde el Router
 
@@ -254,13 +255,119 @@ finally{(()=>mysql.destroy())}
     }
 }
 ```
-1. creación de la exportación del controller
+* creación de la exportación del controller
 
 ```javascript
 module.exports = router;
 ```
+* product models, script dentro de la carpeta models donde se comparte  el archivo con la lista de productos para las funciones que lo soliciten.
 
+```javascript	
+const mysql = require('../options/mysql.config');
 
+const N_TABLE="products"
+const Manager= require('../controllers/product.manager')
+const manager = new Manager(mysql,N_TABLE);
+let productsList = manager.findAll()
+.then(products => products)
+.catch(err => console.log(err))
+
+module.exports = productsList;
+```
+
+##Creación del creación del controller chat##
+
+* creación del constructor de la clase Chat, que recibe un objeto knex con la configuración de la base de datos sqlite.
+
+```javascript	
+class ChatManager {
+
+    constructor(bd,table) {
+        this.db=bd;
+        this.table=table;
+    };
+```
+
+* creacion del método ``create()``, el cual ingresa a la DB los datos de un mensaje de chat. el método recibe del chat.router el mensaje ya destructurado para que coicida con los datos que recibe la tabla *chats*.
+
+[!NOTE] Desde el Router
+```javascript
+    router.post('/', (req, res) => {
+    try{
+    if (!req.body.email || !req.body.message) return res.send({error: 'data is required'})
+    // create the new objet `Date`
+    const now = new Date();
+    const date = now.toLocaleString();
+    const {email, msg} =req.body;
+    const message = {
+        email,
+        msg,
+        date
+    }
+    manager.create(message).then(result => res.send(result))
+    }catch{(err=>console.log(err))}
+    finally{(()=>mysql.destroy())}
+})
+```
+
+[!NOTE] En el controller
+
+```javascript
+async create(message){
+        try {
+                message = {
+                    email: message.email,
+                    timestamp: new Date().toLocaleString(),
+                    message: message.message
+                }
+                await this.db(this.table).insert(message)
+                
+                return [message]
+        } catch(err) {
+            return {status: "error", message: err.message}
+        }
+    }
+```
+
+* Creación del método ``findAll()``, el cual envia todos los chats guardados en la base de datos, al chat.router
+
+[!NOTE] Desde el Router
+```javascript
+router.get('/', (req, res) => {
+    try{
+    manager.findAll().then(result => res.send(result))
+    }catch{(err=>console.log(err))}
+    finally{(()=>mysql.destroy())}
+})
+```
+
+[!NOTE] En el controller
+
+```javascript
+     async findAll(){
+        let chat= result=JSON.parse(JSON.stringify(
+        await this.db(this.table).where({}).select("email","msg","date")))
+        ||[];
+        return chat; 
+    }
+}
+```
+
+* chat models, script dentro de la carpeta models donde se comparte  el archivo con la lista de chat para las funciones que lo soliciten.
+
+```javascript
+const sqlLite= require('../options/sqlite.config');
+
+const tbl_chats= "chats";
+const Manager = require('../controllers/chat.manager');
+const manager = new Manager(sqlLite,tbl_chats);
+
+let chat = manager.findAll()
+.then(chats=>chats)
+.catch(err => console.log(err))
+
+module.exports = chat;
+```
 
 
 

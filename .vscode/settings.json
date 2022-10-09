@@ -4,5 +4,8 @@
         "ecommerce",
         "hechos",
         "Pasos"
+    ],
+    "cSpell.enableFiletypes": [
+        "!markdown"
     ]
 }

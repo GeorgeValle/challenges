@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const sqlite= require('../options/sqlite.config');
-const tbl_table = "chats";
+const tbl_chats = "chats";
 
 
 const Manager = require('../controllers/chat.manager')
-const manager = new Manager(sqlite,tbl_table)
+const manager = new Manager(sqlite,tbl_chats)
 
 router.get('/', (req, res) => {
     try{
