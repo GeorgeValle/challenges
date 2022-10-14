@@ -15,8 +15,7 @@
  
 ```
 
-[!NOTA] en este caso el script de sqlite3
-
+[!NOTA] en este caso el script de sqlit
 ```javascript
 
 ```
