@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 
 const router=express.Router();
 
 //casting class book
-const Book=require('../controllers/ManagerBook');
+import {Book} from'../controllers/ManagerBook.js';
 const book = new Book();
 
 let isAdmin=true;
@@ -45,4 +45,5 @@ router.delete('/:id', async(req, res) => {
     }else{res.status(404).send({error: -1, description: `route ${req.baseUrl}${req.url} method ${req.method} not authorized`});}
 })
 
-module.exports = router;
+const productRouter = router;
+export {productRouter};

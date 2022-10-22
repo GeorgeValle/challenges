@@ -1,8 +1,8 @@
-const express = require ('express');
+import express from 'express';
 const app = express();
 
-const productsRouter = require('./router/Products.router');
-const cartsRouter = require('./router/Carts.router');
+import {productRouter} from './router/Productsrouter.js';
+import {cartRouter} from './router/Cartsrouter.js';
 
 const PORT = process.env.PORT||8080;
 
@@ -15,13 +15,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-
-
-
 //routes to books and carts
-app.use('/api/productos',productsRouter);
-app.use('/api/carrito',cartsRouter);
+app.use('/api/productos',productRouter);
+app.use('/api/carrito',cartRouter);
 
 app.use((req, res) => {
     res.status(404).send({error: -2, description: `route ${req.baseUrl}${req.url} method ${req.method} not implemented`});
 });
+
+
+export default app;

@@ -1,11 +1,11 @@
-const fs=require('fs');
+import fs from 'fs';
 // save the path to json file of Carts
 const addressJProduct='./src/data/cartProducts.json';
 
 //file of products
 const addressProduct='./src/data/products.json';
-
-const Book=require('./ManagerBook');
+import CartModel from '../models/CartModel.js';
+import {Book} from './ManagerBook.js';
 const book = new Book();
 
 class Cart{
@@ -225,4 +225,5 @@ class Cart{
     }
 
 }
-module.exports = Cart;
+
+export {Cart};

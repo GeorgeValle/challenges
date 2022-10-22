@@ -1,9 +1,10 @@
 //const { error } = require('console');
 //call to filesystem
-const fs=require('fs');
+import fs from 'fs';
 // save the path to json file
 const addressJProduct='./src/data/products.json';
-
+import '../loaders/connection.js';
+import ProductModel from '../models/ProductModel.js'
 
 //create the new class Book
 
@@ -15,6 +16,7 @@ class Book{
             return JSON.parse(data);
             
         }catch (err){return{status:400, message: err.message}}
+
     }
 
     async write(products){
@@ -40,58 +42,77 @@ class Book{
         if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
     }
 
-    save= async (product) => {
-        //validations
-        this.validationsProduct(product);
+    async save(req, res) {
+    //     //validations
+    this.validationsProduct(req.body);
+        try{
+            const createdProduct = await ProductModel.create(req.body)
+            return res.status(200).json(createdProduct) 
+        }
+        catch(err){return res.status(400).json({message: "product not was save"})}
+    //     this.validationsProduct(product);
     
-    try{
+    // try{
         
-        if(fs.existsSync(addressJProduct)){
+    //     if(fs.existsSync(addressJProduct)){
             
-            let products= await this.read();
-            let  id;
-            //if all the contents of the file have been deleted id=0;
-            if(products.length===0){id=0}
-                id = products[products.length-1].id+1;
-                const now = new Date();
-                const timestamp = now.toLocaleString();
-                product.price= parseFloat(product.price).toFixed(2);
-                product.stock= parseInt(product.stock)
-                product.code= parseInt(product.code)
+    //         let products= await this.read();
+    //         let  id;
+    //         //if all the contents of the file have been deleted id=0;
+    //         if(products.length===0){id=0}
+    //             id = products[products.length-1].id+1;
+    //             const now = new Date();
+    //             const timestamp = now.toLocaleString();
+    //             product.price= parseFloat(product.price).toFixed(2);
+    //             product.stock= parseInt(product.stock)
+    //             product.code= parseInt(product.code)
                 
-            product= {
-                id,
-                timestamp,
-                ...product
-            }
-            products.push(product);
+    //         product= {
+    //             id,
+    //             timestamp,
+    //             ...product
+    //         }
+    //         products.push(product);
 
-            //now write whit private function
-            await this.write(products);
-            return{status:200, message: `Product  Created`, data:product};
+    //         //now write whit private function
+    //         await this.write(products);
+    //         return{status:200, message: `Product  Created`, data:product};
 
-        }else{
+    //     }else{
 
-                const now = new Date();
-                const timestamp = now.toLocaleString();
-                product.price= parseFloat(product.price).toFixed(2);
-                product.stock= parseInt(product.stock)
-                product.code= parseInt(product.code)
+    //             const now = new Date();
+    //             const timestamp = now.toLocaleString();
+    //             product.price= parseFloat(product.price).toFixed(2);
+    //             product.stock= parseInt(product.stock)
+    //             product.code= parseInt(product.code)
 
-                product= {
-                    id:1,
-                    timestamp,
-                    ...product
-                }
+    //             product= {
+    //                 id:1,
+    //                 timestamp,
+    //                 ...product
+    //             }
 
-            await fs.promises.writeFile(addressJProduct, JSON.stringify([product],null,2))
+    //         await fs.promises.writeFile(addressJProduct, JSON.stringify([product],null,2))
             
-            return{status:200, message: "Product created", data:product};
+    //         return{status:200, message: "Product created", data:product};
 
-        }
-    }catch(err){
-            return{status:400, message: err.message}
-        }
+    //     }
+    // }catch(err){
+    //         return{status:400, message: err.message}
+    //     }
+    }
+
+    async getAll(req , res) {
+
+        const products = await ProductModel.find()
+        return res.status(200).json(products)
+        
+        // if (fs.existsSync(addressJProduct)) {
+        //     let products= await this.read();
+        //     return {status: 200,message: "Hello GET ALL", data: products}         
+        // }else{
+        //     return {status: 400, message: "don't exist Database of Product"}
+        // }
     }
 
     getById = async (id) => {
@@ -108,15 +129,7 @@ class Book{
         }
     }
 
-    getAll= async () => {
-        
-            if (fs.existsSync(addressJProduct)) {
-                let products= await this.read();
-                return {status: 200,message: "Hello GET ALL", data: products}         
-            }else{
-                return {status: 400, message: "don't exist Database of Product"}
-            }
-        }
+    
     
     updateById= async (id, product) => {
         //Validations
@@ -174,4 +187,4 @@ class Book{
     }
 
 }
-module.exports = Book;
+export {Book};

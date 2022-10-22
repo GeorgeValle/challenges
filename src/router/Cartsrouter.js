@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
 
 const router=express.Router();
 
-const Cart=require('../controllers/ManagerCart');
+import {Cart} from '../controllers/ManagerCart.js';
+
 const cart = new Cart();
 
 //create a new instance of the managerCart, Important!: only put id of product book
@@ -44,6 +45,5 @@ router.delete('/:id/productos/:id_prod', async(req, res) => {
     
 })
 
-
-
-module.exports = router;
+const cartRouter = router
+export {cartRouter}
