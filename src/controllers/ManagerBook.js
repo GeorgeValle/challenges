@@ -115,18 +115,29 @@ class Book{
         // }
     }
 
-    getById = async (id) => {
+    async getById(req, res) {
         //Validations
-        if (!id) return {status: 400, message: "Id required"}
-        id=await this.validationsID(id);
-        try{
-            let products = await this.read();
-            let product = products.find(product => product.id === id)
-            if (product) return {status: 200,message:"Product found:", data: product}
-            return {status: 400, message: "Product not was found"}
-        } catch (err){
-            return {status: 400, message: err.message}
+        try {
+            const { id } = req.params
+            if (!id) return res.status(400).json( {message: "Id required"});
+
+            await ProductModel.findByIdAndUpdate(id, req.body)
+            return res.status(200).json({ message: 'Product updated!'})
+        } catch(err) {
+            return res.status(404).json({ message: 'Failed to update product'})
         }
+
+        // if (!id) return {status: 400, message: "Id required"}
+        // id=await this.validationsID(id);
+        // try{
+        //     let products = await this.read();
+        //     let product = products.find(product => product.id === id)
+        //     if (product) return {status: 200,message:"Product found:", data: product}
+        //     return {status: 400, message: "Product not was found"}
+        // } catch (err){
+        //     return {status: 400, message: err.message}
+        // }
+
     }
 
     
