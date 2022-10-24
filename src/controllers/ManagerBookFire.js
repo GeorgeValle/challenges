@@ -1,16 +1,12 @@
-//const { error } = require('console');
-//call to filesystem
-// import fs from 'fs';
-// save the path to json file
-// const addressJProduct='./src/data/products.json';
-import '../loaders/connection.js';
-import ProductModel from '../models/ProductModel.js'
-
-//create the new class Book
+import {db} from '../loaders/ConnectionBase';
+import { query, orderBy, where, collection, getDocs } from '@firebase/firestore';
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 class Book{
     //IIEF
-    
+    constructor(){
+    products = db.collection('products')
+    }
     validationsProduct(product){
         if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
     }
@@ -19,7 +15,7 @@ class Book{
     try{    
         //validations
         this.validationsProduct(req.body);
-        const createdProduct = await ProductModel.create(req.body)
+        const createdProduct = await this.products.add(req.body)
         return res.status(200).json(createdProduct) 
         }catch(err){
             return res.status(400).json({message: "product not was save"})
@@ -27,35 +23,58 @@ class Book{
     }
 
     async getAll(req , res) {
+        try{
+        let q;
+        q = query(collection(db, "products"), orderBy('name'))
+        const querySnapshot = await getDocs(q);
+        const productsFromFirestore = querySnapshot.docs.map(document => ({
+        id: document.id,
+        ...document.data()
+    }));
+    return res.status(200).json(productsFromFirestore) ;
+}catch(err){return res.status(404).json({ message: 'Failed to load products'})}
 
-        const products = await ProductModel.find()
-        return res.status(200).json(products)
+
+        // const products = await ProductModel.find()
+        // return res.status(200).json(products)
     }
 
     async getById(req, res) {
-        
         try {
             const { id } = req.params
             //Validations
             if (!id) return res.status(400).json( {message: "Id required"});
-
-            await ProductModel.findById(id, req.body)
-            return res.status(200).json(product)
+            const docRef = doc(db, "products", id);
+            const docSnap = await getDoc(docRef);
+            let product;
+            if (docSnap.exists()) {
+                product ={
+                id: id,
+                ...docSnap.data()
+                }
+                return res.status(200).json(product)
+            }         
         } catch(err) {
+            // doc.data() will be undefined in this case
             return res.status(404).json({ message: 'Product does not exits'})
         }
-
     }
 
-    
-    
+
     updateById= async (req , res) => {
         //Validations
         try {
             const { id } = req.params
             this.validationsProduct(req.body);
+
+            const washingtonRef = doc(db, "cities", "DC");
+
+            // Set the "capital" field of the city 'DC'
+            await updateDoc(washingtonRef, {
+            capital: true
+            });
             if (!id) return res.status(400).json( {message: "Id required"});
-            await ProductModel.findByIdAndUpdate(id, req.body)
+            await products.doc(req.body,id)
             return res.status(200).json({ message: 'Product updated!'})
         } catch(err) {
             return res.status(404).json({ message: 'Failed to update product'})
