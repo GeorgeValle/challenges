@@ -5,8 +5,8 @@ const addressJProduct='./src/data/cartProducts.json';
 //file of products
 const addressProduct='./src/data/products.json';
 import CartModel from '../models/CartModel.js';
-import {Book} from './ManagerBook.js';
-const book = new Book();
+import book from './ManagerBook.js';
+
 
 class Cart{
     //IIEF

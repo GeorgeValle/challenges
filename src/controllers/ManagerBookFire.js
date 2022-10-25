@@ -1,11 +1,9 @@
-import {db} from '../loaders/ConnectionBase';
-import { query, orderBy, where, collection, getDocs } from '@firebase/firestore';
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {db} from '../loaders/ConnectionBase.js';
 
 class Book{
     //IIEF
     constructor(){
-    products = db.collection('products')
+    this.products = db.collection('products')
     }
     validationsProduct(product){
         if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
@@ -15,48 +13,68 @@ class Book{
     try{    
         //validations
         this.validationsProduct(req.body);
+        
         const createdProduct = await this.products.add(req.body)
         return res.status(200).json(createdProduct) 
         }catch(err){
+            console.log(err)
             return res.status(400).json({message: "product not was save"})
         }
     }
 
     async getAll(req , res) {
         try{
-        let q;
-        q = query(collection(db, "products"), orderBy('name'))
-        const querySnapshot = await getDocs(q);
-        const productsFromFirestore = querySnapshot.docs.map(document => ({
-        id: document.id,
-        ...document.data()
-    }));
-    return res.status(200).json(productsFromFirestore) ;
-}catch(err){return res.status(404).json({ message: 'Failed to load products'})}
 
 
-        // const products = await ProductModel.find()
-        // return res.status(200).json(products)
+            const querySnapshot = await this.products.get()
+            const productsFromFirestore = querySnapshot.docs.map(document => ({
+                id: document.id,
+                ...document.data()
+                }));
+            return res.status(200).json(productsFromFirestore) ;
+        }catch(err){
+            console.log(err)
+            return res.status(400).json({ message: 'Failed to load products'})
+        }
     }
 
     async getById(req, res) {
         try {
             const { id } = req.params
             //Validations
-            if (!id) return res.status(400).json( {message: "Id required"});
-            const docRef = doc(db, "products", id);
-            const docSnap = await getDoc(docRef);
-            let product;
-            if (docSnap.exists()) {
-                product ={
-                id: id,
-                ...docSnap.data()
-                }
+            if (!id) return res.status(400).json({message: "Id required"});
+            const item = await this.products.doc(id).get()
+            
+            if (item.exists) {
+                let product= { id:id, ...item.data() }
                 return res.status(200).json(product)
-            }         
+            }else{
+                return res.status(404).json({ message: "Product does not exits"})
+            }       
         } catch(err) {
             // doc.data() will be undefined in this case
-            return res.status(404).json({ message: 'Product does not exits'})
+            console.log(err);
+            return res.status(400).json({ message:"Product not found!"});
+        }
+    }
+
+    async getBook(id_product) {
+        try {
+            
+            //Validations
+            if (!id_product) return res.status(400).json({message: "Id required"});
+            const item = await this.products.doc(id).get()
+            
+            if (item.exists) {
+                return {id:id, ...item.data()}
+                
+            }else{
+                return res.status(404).json({ message: "Product does not exits"})
+            }       
+        } catch(err) {
+            // doc.data() will be undefined in this case
+            console.log(err);
+            return res.status(400).json({ message:"Product not found!"});
         }
     }
 
@@ -65,41 +83,34 @@ class Book{
         //Validations
         try {
             const { id } = req.params
+            if (!id) return res.status(400).json( {message: "Id required"});
             this.validationsProduct(req.body);
 
-            const washingtonRef = doc(db, "cities", "DC");
-
-            // Set the "capital" field of the city 'DC'
-            await updateDoc(washingtonRef, {
-            capital: true
-            });
-            if (!id) return res.status(400).json( {message: "Id required"});
-            await products.doc(req.body,id)
-            return res.status(200).json({ message: 'Product updated!'})
+            const item = await this.products.doc(id).get()
+            if (item.exists) {
+                await this.products.doc(id).set(req.body)
+                return res.status(200).json({ message: 'Product updated!'})
+            }else{
+                return res.status(404).json({ message: 'Product to update not found!' })
+            }
         } catch(err) {
-            return res.status(404).json({ message: 'Failed to update product'})
+            console.log(err);
+            return res.status(400).json({ message: 'Failed to update product'})
         }
 
     }
 
-    deleteById = async (id) => {
-        //Validations
+    deleteById = async (req , res) => {
         try {
             const { id } = req.params
+            //Validations
             if (!id) return res.status(400).json( {message: "Id required"});
-            const productDeleted = await ProductModel.findByIdAndDelete(id)
+            const productDeleted = await this.products.doc(id).delete()
             if (!productDeleted) return res.status(404).json({ message: 'Product does not exists'})
             return res.status(200).json({ message: 'Product deleted!'})
-        }catch(err){return res.status(404).json({ message: 'Failed to delete product'})}
-    }
-
-    deleteAll = async () => {
-        if (fs.existsSync(addressJProduct)) {
-            
-            await this.write([]);
-            return {status: 200, message: "Products DELETED!"}
-        } else {
-            return {status: 200, message: "Delete all failed!"}
+        }catch(err){
+            console.log(err);
+            return res.status(400).json({ message: 'Failed to delete product'})
         }
     }
 
