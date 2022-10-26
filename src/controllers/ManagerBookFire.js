@@ -62,19 +62,18 @@ class Book{
         try {
             
             //Validations
-            if (!id_product) return res.status(400).json({message: "Id required"});
+            if (!id_product) return {message: "Id required"};
             const item = await this.products.doc(id).get()
             
             if (item.exists) {
                 return {id:id, ...item.data()}
                 
             }else{
-                return res.status(404).json({ message: "Product does not exits"})
+                return { message: "Product does not exits"}
             }       
         } catch(err) {
-            // doc.data() will be undefined in this case
+            // will be undefined in this case
             console.log(err);
-            return res.status(400).json({ message:"Product not found!"});
         }
     }
 

@@ -37,9 +37,10 @@ class Book{
         try {
             const { id } = req.params
             //Validations
-            if (!id) return res.status(400).json( {message: "Id required"});
+            if (!id) return res.status(400).json({message: "Id required"});
 
-            await ProductModel.findById(id, req.body)
+            const product= await ProductModel.findById(id)
+            if (!product) return res.status(404).json({ message: 'Product does not exits'})
             return res.status(200).json(product)
         } catch(err) {
             return res.status(404).json({ message: 'Product does not exits'})
@@ -47,7 +48,17 @@ class Book{
 
     }
 
-    
+    getProduct= async (id_product) => {
+        
+        if (!id_product) return {message: "Id required"};
+        try{
+            const product= await ProductModel.findById(id)
+            if (!product) return { message: 'Product does not exits'}
+                return product;
+        }catch (err){
+            console.log(err);
+        }
+    }
     
     updateById= async (req , res) => {
         //Validations

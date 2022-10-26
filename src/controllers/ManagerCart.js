@@ -9,124 +9,55 @@ import book from './ManagerBook.js';
 
 
 class Cart{
-    //IIEF
-    //read file of carts
-    async read(){
-        try{
-            let data= await fs.promises.readFile(addressJProduct,'utf-8');
-            return JSON.parse(data);
-            
-        }catch (err){return{status:400, message: err.message}}
-    }
-
-    //read file of products
-    async readProducts(){
-        try{
-            let data= await fs.promises.readFile(addressProduct,'utf-8');
-            return JSON.parse(data);
-            
-        }catch (err){return{status:400, message: err.message}}
-    }
-    //write cart products
-    async write(products){
-        try{
-            await fs.promises.writeFile(addressJProduct, JSON.stringify(products,null,2))
-        }catch (err){return{status:400, message: err.message}}
-        }
-        //validation of carts
-        async validationsID(id){
-            try{
-                if(!fs.existsSync(addressJProduct)) return {status:400, message:"not existence data base"};
-                let products = await this.read();
-                id=parseInt(id, 10);
-                if(isNaN(id)) return {status:400, message:"not existence Id. Please, enter only numbers"};
-                if(id<0)return {status:400, message:"not existence Id. Please, enter Id above 0"};
-                if(id>products.length+1) return {status:400, message:"out of range"};
-                return id;
-                    
-            }catch (err){return{status:400, message: err.message}}
-        }
-        //validation of products
-    async validationsIDProduct(id){
-        try{
-            if(!fs.existsSync(addressProduct)) return {status:400, message:"not existence data base"};
-            let products = await this.readProducts();
-            id=parseInt(id, 10);
-            if(isNaN(id)) return {status:400, message:"not existence Id. Please, enter only numbers"};
-            if(id<0)return {status:400, message:"not existence Id. Please, enter Id above 0"};
-            if(id>products.length) return {status:400, message:"out of range"};
-            return id;
-                
-        }catch (err){return{status:400, message: err.message}}
-    }
 
     //receive a id of product
-    save= async () => {
+    save= async (req, res) => {
         //validations
-        //let id_prod = await this.#validationsIDProduct(idProduct);
-    
-    try{
-        
-        if(fs.existsSync(addressJProduct)){
-            //read product
-            let carts= await this.read();
-            let  id;
-            //if all the contents of the file have been deleted id=0;
-            if(carts.length===0){id=0}
-                id = carts[carts.length-1].id+1;
-                const now = new Date();
-                const timestamp = now.toLocaleString();
-
-            let cart={
-                id,
-                timestamp,
-                products:[]
-
-                }
-            carts.push(cart);
-
-            //now write whit private function
-            await this.write(carts);
-            return{status:200, message: `Cart  Created`, data:cart};
-
-        }else{
-
-                const now = new Date();
-                const timestamp = now.toLocaleString();
-
-                let cart= {
-                    id:1,
-                    timestamp,
-                    products:[]    
-                }
-
-            await fs.promises.writeFile(addressJProduct, JSON.stringify([cart],null,2))
+        try{
             
-            return{status:200, message: "Cart created", data:cart};
-
-        }
-    }catch(err){
-            return{status:400, message: err.message}
+            const createdCart = await CartModel.create();
+        
+            return res.status(200).json(createdCart)
+        }catch(err){
+            console.log(err)
+            return{status:400, message: "error cart not created"}
         }
     }
+    
 
     //obtain a product from cart by id_prod
-    getById = async (id) => {
+    getById = async (req,res) => {
         //Validations
-        if (!id) return {status: 400, message: "Id required"}
+        try {
+            const { id } = req.params
+            //Validations
+            if (!id) return res.status(400).json( {message: "Id required"});
 
-        id=await this.validationsID(id);
-        try{
-            let carts = await this.read();
-            let cart = carts.find(cart => cart.id === id)
-            if (cart) return {status: 200,message:"Cart found:", data: cart.products}
-            return {status: 400, message: "Cart not was found"}
-        } catch (err){
-            return {status: 400, message: err.message}
+            const cart = await CartModel.findById(id)
+            if(!cart) return res.status(404).json({ message: 'Cart does not exits'})
+            return res.status(200).json(cart)
+        } catch(err) {
+            console.log(err);
+            return res.status(404).json({ message: 'Product does not exits'});
         }
+
+
+
+        // if (!id) return {status: 400, message: "Id required"}
+
+        // id=await this.validationsID(id);
+        // try{
+        //     let carts = await this.read();
+        //     let cart = carts.find(cart => cart.id === id)
+        //     if (cart) return {status: 200,message:"Cart found:", data: cart.products}
+        //     return {status: 400, message: "Cart not was found"}
+        // } catch (err){
+        //     return {status: 400, message: err.message}
+        // }
     }
 
     //call a product object by id
+    
     getProduct= async (id_product) => {
         if (!id_product) return {status: 400, message: "Id required"}
         let id_prod= await this.validationsIDProduct(id_product);
@@ -226,4 +157,4 @@ class Cart{
 
 }
 
-export {Cart};
+export default new Cart();

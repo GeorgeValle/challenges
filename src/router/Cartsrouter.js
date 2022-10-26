@@ -2,9 +2,9 @@ import express from 'express';
 
 const router=express.Router();
 
-import {Cart} from '../controllers/ManagerCart.js';
+import cart from '../controllers/ManagerCart.js';
 
-const cart = new Cart();
+
 
 //create a new instance of the managerCart, Important!: only put id of product book
 router.post('/', async (req, res) => {
@@ -12,6 +12,7 @@ router.post('/', async (req, res) => {
     res.send(create);
 
 })
+routes.post('/products',book.save)
 
 router.post('/:id/productos/:id_prod', async(req, res) => {
 

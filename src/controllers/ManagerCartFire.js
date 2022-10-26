@@ -8,19 +8,6 @@ class Cart{
         this.carts = db.collection('carts')
         }
     
-        //validation of products
-    async validationsIDProduct(id){
-        try{
-            if(!fs.existsSync(addressProduct)) return {status:400, message:"not existence data base"};
-            let products = await this.readProducts();
-            id=parseInt(id, 10);
-            if(isNaN(id)) return {status:400, message:"not existence Id. Please, enter only numbers"};
-            if(id<0)return {status:400, message:"not existence Id. Please, enter Id above 0"};
-            if(id>products.length) return {status:400, message:"out of range"};
-            return id;
-                
-        }catch (err){return{status:400, message: err.message}}
-    }
 
     //receive a id of product
     save= async (req, res) => {
