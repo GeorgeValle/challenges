@@ -74,7 +74,7 @@ class Book{
 
     }
 
-    deleteById = async (id) => {
+    deleteById = async (req,res) => {
         //Validations
         try {
             const { id } = req.params
@@ -85,15 +85,15 @@ class Book{
         }catch(err){return res.status(404).json({ message: 'Failed to delete product'})}
     }
 
-    deleteAll = async () => {
-        if (fs.existsSync(addressJProduct)) {
+    // deleteAll = async () => {
+    //     if (fs.existsSync(addressJProduct)) {
             
-            await this.write([]);
-            return {status: 200, message: "Products DELETED!"}
-        } else {
-            return {status: 200, message: "Delete all failed!"}
-        }
-    }
+    //         await this.write([]);
+    //         return {status: 200, message: "Products DELETED!"}
+    //     } else {
+    //         return {status: 200, message: "Delete all failed!"}
+    //     }
+    // }
 
 }
 export default new Book();
