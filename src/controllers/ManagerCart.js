@@ -47,11 +47,14 @@ class Cart{
 
         try {
             const { id } = req.params
-            this.validationsProduct(req.body);
             if (!id) return res.status(400).json( {message: "Id required"});
+            const { id_prod } = req.params;
+            if (!id_prod) return res.status(400).json( {message: " Product ID required"});
+
+            let newProduct= await book.getBook(id_prod);
             const updated = await CartModel.findByIdAndUpdate(id,
                 {$push: {
-                        'products':req.body,
+                        'products':newProduct,
                         },
                 })
 

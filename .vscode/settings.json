@@ -1,10 +1,12 @@
 {
     "cSpell.words": [
         "carrito",
+        "Cartsrouter",
         "entrega",
         "Firestore",
         "IIEF",
         "primera",
-        "productos"
+        "productos",
+        "Productsrouter"
     ]
 }

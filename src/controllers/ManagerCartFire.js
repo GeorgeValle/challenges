@@ -1,5 +1,5 @@
 import {db} from '../loaders/ConnectionBase.js';
-import CartModel from '../models/CartModel.js';
+
 import book from './ManagerBookFire.js';
 
 class Cart{

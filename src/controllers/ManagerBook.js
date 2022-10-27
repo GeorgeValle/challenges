@@ -48,7 +48,7 @@ class Book{
 
     }
 
-    getProduct= async (id_product) => {
+    getBook= async (id_product) => {
         
         if (!id_product) return {message: "Id required"};
         try{
