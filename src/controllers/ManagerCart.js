@@ -1,12 +1,5 @@
-import fs from 'fs';
-// save the path to json file of Carts
-const addressJProduct='./src/data/cartProducts.json';
-
-//file of products
-const addressProduct='./src/data/products.json';
 import CartModel from '../models/CartModel.js';
 import book from './ManagerBook.js';
-
 
 class Cart{
 

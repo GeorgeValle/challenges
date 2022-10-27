@@ -1,8 +1,3 @@
-//const { error } = require('console');
-//call to filesystem
-// import fs from 'fs';
-// save the path to json file
-// const addressJProduct='./src/data/products.json';
 import '../loaders/connection.js';
 import ProductModel from '../models/ProductModel.js'
 

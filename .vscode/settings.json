@@ -8,5 +8,8 @@
         "primera",
         "productos",
         "Productsrouter"
+    ],
+    "cSpell.enableFiletypes": [
+        "!markdown"
     ]
 }
