@@ -46,7 +46,7 @@ class Book{
             const item = await this.products.doc(id).get()
             
             if (item.exists) {
-                let product= { id:id, ...item.data() }
+                let product= { _id:id, ...item.data() }
                 return res.status(200).json(product)
             }else{
                 return res.status(404).json({ message: "Product does not exits"})
@@ -66,7 +66,7 @@ class Book{
             const item = await this.products.doc(id).get()
             
             if (item.exists) {
-                return {id:id, ...item.data()}
+                return {_id:id, ...item.data()}
                 
             }else{
                 return { message: "Product does not exits"}
@@ -74,6 +74,7 @@ class Book{
         } catch(err) {
             // will be undefined in this case
             console.log(err);
+            return { message: 'Failed to add product'}
         }
     }
 

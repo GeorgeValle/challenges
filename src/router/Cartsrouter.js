@@ -1,6 +1,7 @@
-import express from 'express';
+import {Router} from 'express';
 
-const router=express.Router();
+
+const routes= Router();
 
 //********************************************** */
 //below, you can configure the type of storage
@@ -13,19 +14,22 @@ import cart from '../controllers/ManagerCart.js';
 
 
 //create a new instance of the managerCart, Important!: only put id of product book
-router.post('/products', cart.save)
+routes.post('/', cart.save)
 
 //insert a new product in a cart
-router.post('/:id/productos/:id_prod', cart.updateById)
+routes.put('/:id/productos/:id_prod', cart.updateById)
 
 //get a Cart by identifier
-router.get('/:id', cart.getById)
+routes.get('/:id', cart.getById)
+
+//get a list of carts
+routes.get('/', cart.getAll)
 
 //delete a Cart by identifier
-router.delete('/:id', cart.deleteCart)
+routes.delete('/:id', cart.deleteCart)
 
 //delete product by identifier
-router.delete('/:id/productos/:id_prod', cart.deleteById)
+routes.delete('/:id/productos/:id_prod', cart.deleteById)
 
-const cartRouter = router
+const cartRouter = routes
 export {cartRouter}

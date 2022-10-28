@@ -1,3 +1,4 @@
+import '../loaders/connection.js';
 import CartModel from '../models/CartModel.js';
 import book from './ManagerBook.js';
 
@@ -8,9 +9,10 @@ class Cart{
         //validations
         try{
             
-            const createdCart = await CartModel.create();
+            const createdCart = await CartModel.create({});
+            if(!createdCart)return res.status(404).json({ message: 'Cart does not created'})
         
-            return res.status(200).json(createdCart)
+            return res.status(200).json({message: "Cart created", data: createdCart})
         }catch(err){
             console.log(err)
             return{status:400, message: "error cart not created"}
@@ -65,14 +67,15 @@ class Cart{
             const { id_prod } = req.params;
             if (!id_prod) return res.status(400).json( {message: "Product Id required"});
 
-            const deleted = await CartModel.findByIdAndUpdate(id,
+            const deleted = await CartModel.findOneAndUpdate({_id:id},
                 {$pull: {
-                        'products':id_prod,
+                        products:id_prod,
                         },
                 })
 
-            return res.status(200).json({ message: 'Product deleted!', data:{deleted}})
+            return res.status(200).json({ message: 'Product deleted!', data: deleted})
         } catch(err) {
+            console.log(err);
             return res.status(404).json({ message: 'Failed to delete product'})
         }
     }
@@ -82,12 +85,17 @@ class Cart{
         try {
             const { id } = req.params
             if (!id) return res.status(400).json( {message: "Cart Id required"});
-            const cartDeleted = await ProductModel.findByIdAndDelete(id)
+            const cartDeleted = await CartModel.findByIdAndDelete(id)
             if (!cartDeleted) return res.status(404).json({ message: 'Cart does not exists'})
-            return res.status(200).json({ message: 'Cart deleted!'})
+            return res.status(200).json({ message: 'Cart deleted!', data: cartDeleted})
         }catch(err){return res.status(404).json({ message: 'Failed to delete cart'})}
     }
 
+    async getAll(req , res) {
+
+        const products = await CartModel.find()
+        return res.status(200).json({data:products})
+    }
 }
 
 export default new Cart();

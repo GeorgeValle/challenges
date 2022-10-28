@@ -13,10 +13,11 @@ class Book{
     async save(req, res) {
     try{    
         //validations
-        this.validationsProduct(req.body);
+       //this.validationsProduct(req.body);
         const createdProduct = await ProductModel.create(req.body)
         return res.status(200).json(createdProduct) 
         }catch(err){
+            console.log(err);
             return res.status(400).json({message: "product not was save"})
         }
     }
@@ -24,7 +25,7 @@ class Book{
     async getAll(req , res) {
 
         const products = await ProductModel.find()
-        return res.status(200).json(products)
+        return res.status(200).json({data:products})
     }
 
     async getById(req, res) {
@@ -47,7 +48,7 @@ class Book{
         
         if (!id_product) return {message: "Id required"};
         try{
-            const product= await ProductModel.findById(id)
+            const product= await ProductModel.findById(id_product)
             if (!product) return { message: 'Product does not exits'}
                 return product;
         }catch (err){

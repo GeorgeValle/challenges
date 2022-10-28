@@ -19,19 +19,19 @@ routes.get('/health', (req, res) => {
 })
 
 //create a new instance of the managerBook
-routes.post('/products',book.save)
+routes.post('/',book.save)
 
 //get all books
-routes.get('/products', book.getAll)
+routes.get('/', book.getAll)
 
 //get a book by identifier
-routes.get('/products/:id', book.getById)
+routes.get('/:id', book.getById)
 
 //update by identifier
-routes.put('/products/:id', book.updateById)
+routes.put('/:id', book.updateById)
 
 //delete by identifier
-routes.delete('/products/:id', book.deleteById)
+routes.delete('/:id', book.deleteById)
 
 const productRouter = routes;
 export {productRouter};
