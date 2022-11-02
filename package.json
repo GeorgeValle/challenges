@@ -1,0 +1,24 @@
+{
+  "name": "desafio-12",
+  "version": "1.0.0",
+  "description": "challenge class 16, chat and product list whit db for save files",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "George_Valley",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "express-handlebars": "^6.0.6",
+    "knex": "^2.3.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "socket.io": "^4.5.2",
+    "sqlite3": "^5.1.2"
+  }
+}
