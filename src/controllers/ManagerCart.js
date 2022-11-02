@@ -67,11 +67,13 @@ class Cart{
             const { id_prod } = req.params;
             if (!id_prod) return res.status(400).json( {message: "Product Id required"});
 
-            const deleted = await CartModel.findOneAndUpdate({_id:id},
+            const deleted = await CartModel.findByIdAndUpdate(id,
                 {$pull: {
-                        products:id_prod,
-                        },
-                })
+                        products:{_id:id_prod}
+                        }
+                },
+                { safe: true }
+            );
 
             return res.status(200).json({ message: 'Product deleted!', data: deleted})
         } catch(err) {

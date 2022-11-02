@@ -28,3 +28,4 @@ yarn-error.log*
 # google
 
 service.AccountKey.json.json
+/serviceAccountKey.json

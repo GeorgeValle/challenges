@@ -5,9 +5,9 @@ const routes= Router();
 
 //casting class book
 import book from'../controllers/ManagerBook.js';
-//import book from'../controllers/ManagerBookFire.js';
+// import book from'../controllers/ManagerBookFire.js';
 //dynamic import:
-//const book = await import('../controllers/ManagerBook.js');
+// const book = await import('../controllers/ManagerBook.js');
 //book.default();
 
 
