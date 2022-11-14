@@ -77,7 +77,7 @@ app.use(express.urlencoded({ extended:true }));
 app.use(session({
     store:new Storage({
         path: './session',
-        ttl:120 //time to live
+        ttl:600000 //time to live
     })
 }))
 
