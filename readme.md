@@ -2,12 +2,20 @@
 
 ## Dependencias
 ```javascript
-"dependencies": {
+   "dependencies": {
+    "connect-mongo": "^4.6.0",
+    "cookie": "^0.5.0",
+    "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "express-handlebars": "^6.0.6",
+    "express-session": "^1.17.3",
     "knex": "^2.3.0",
+    "mongodb": "^4.11.0",
+    "moongose": "^1.0.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.20",
+    "parser": "^0.1.4",
+    "session-file-store": "^1.5.0",
     "socket.io": "^4.5.2",
     "sqlite3": "^5.1.2"
   }

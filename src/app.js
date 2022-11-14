@@ -1,8 +1,19 @@
-//server Express
-const express = require('express');
-
+//Dotenv config 
 // const dotenv = require('dotenv');
 // dotenv.config({path: './'});
+const dotenv= require ('dotenv');
+dotenv.config();
+
+const connection= require ('./loaders/connection');
+
+//server Express
+const express = require('express');
+const session= require('express-session');
+const FileStore = require('session-file-store');
+
+const store = FileStore(session);
+
+
 
 //configuration web socket 
 const {Server}= require('socket.io');
@@ -45,6 +56,14 @@ try{
 }
 })
 
+
+let baseSession = session({
+    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
+    secret: 'c0d3r',
+    resave: false,
+    saveUninitialized: false
+})
+
 // class chat
 const Manager = require('./controllers/chat.manager');
 const manager = new Manager(sqlite,tbl_chats);
@@ -54,6 +73,13 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
 
+//session
+app.use(session({
+    store:new Storage({
+        path: './session',
+        ttl:120 //time to live
+    })
+}))
 
 app.use('/content', express.static('./src/public'))
 
