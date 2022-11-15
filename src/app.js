@@ -22,6 +22,8 @@ const handlebars = require('express-handlebars');
 
 const productRouter = require('./routes/product.router');
 const chatRouter = require('./routes/chat.router');
+//path route session
+const sessionRouter = require('./routes/session.router')
 
 const createTable1 = require('./options/createTable1');
 const createTable2 = require('./options/createTable2');    
@@ -66,6 +68,7 @@ let baseSession = session({
 
 // class chat
 const Manager = require('./controllers/chat.manager');
+const { application } = require('express');
 const manager = new Manager(sqlite,tbl_chats);
 
 const io = new Server(server);
@@ -97,6 +100,7 @@ app.get('/', (req, res) => {
 //path to routes
 app.use('/products', productRouter)
 app.use('/chat', chatRouter)
+app.use('/session',sessionRouter)
 
 //event connection
 io.on('connection', socket => {

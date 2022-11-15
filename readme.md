@@ -21,7 +21,42 @@
   }
 ```
 
+## Configuracion de File Store 
 
+* Configuracion en app js
+
+```javascript
+//trae el archivo options con la coneción a mongoDB Atlas
+const connection= require ('./loaders/connection');
+
+//server Express
+const express = require('express');
+const session= require('express-session');
+const FileStore = require('session-file-store');
+
+const store = FileStore(session);
+```
+
+* se configura para una sesion una sesion
+
+```javascript
+let baseSession = session({
+    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
+    secret: 'c0d3r',
+    resave: false,
+    saveUninitialized: false
+})
+
+```
+
+* se configura una ruta
+
+```javascript
+//path route session
+const sessionRouter = require('./routes/session.router')
+
+app.use('/session',sessionRouter)
+```
 
 ## Creación de objeto Knex y tablas
 * se creó el script options ya instanciando un objeto knex para dar los métodos a cualquier parte que se exporte tanto MySQL como SQLITE.
