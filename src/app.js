@@ -9,11 +9,12 @@ const connection= require ('./loaders/connection');
 //server Express
 const express = require('express');
 const session= require('express-session');
-const FileStore = require('session-file-store');
+// const FileStore = require('session-file-store');
 
-const store = FileStore(session);
+// const store = FileStore(session);
 
 const MongoStore = require('connect-mongo');
+const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
 
 
@@ -61,12 +62,12 @@ try{
 })
 
 
-let baseSession = session({
-    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
-    secret: 'c0d3r',
-    resave: false,
-    saveUninitialized: false
-})
+// let baseSession = session({
+//     store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
+//     secret: 'c0d3r',
+//     resave: false,
+//     saveUninitialized: false
+// })
 
 
 
@@ -82,11 +83,15 @@ app.use(express.urlencoded({ extended:true }));
 
 //session
 app.use(session({
-    store:new Storage({
-        path: './session',
-        ttl:600000 //time to live
-    })
-   
+    store: MongoStore.create({ mongoUrl: proccess.env.DB_ATLAS, mongoOptions: advancedOptions }),
+        // path: './session',
+        // ttl:600000 //time to live
+        secret: 'coder',
+        resave:false,
+        saveUninitialized: false,
+        cookie:{
+            maxAge: 60000
+        }
 }))
 
 app.use('/content', express.static('./src/public'))

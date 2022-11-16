@@ -3,7 +3,10 @@
         "desafio",
         "ecommerce",
         "hechos",
-        "Pasos"
+        "Pasos",
+        "proccess",
+        "resave",
+        "signup"
     ],
     "cSpell.enableFiletypes": [
         "!markdown"

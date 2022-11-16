@@ -21,7 +21,7 @@
   }
 ```
 
-## Configuracion de File Store 
+## Configuracion de Mongo Store
 
 * Configuracion en app js
 
@@ -32,20 +32,28 @@ const connection= require ('./loaders/connection');
 //server Express
 const express = require('express');
 const session= require('express-session');
-const FileStore = require('session-file-store');
 
-const store = FileStore(session);
+const MongoStore = require('connect-mongo');
+const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
+
+
 ```
 
 * se configura para una sesion una sesion
 
 ```javascript
-let baseSession = session({
-    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
-    secret: 'c0d3r',
-    resave: false,
-    saveUninitialized: false
-})
+//session
+app.use(session({
+    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS, mongoOptions: advancedOptions }),
+        // path: './session',
+        // ttl:600000 //time to live
+        secret: 'coder',
+        resave:false,
+        saveUninitialized: false,
+        cookie:{
+            maxAge: 60000
+        }
+}))
 
 ```
 
