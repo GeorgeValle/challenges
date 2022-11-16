@@ -13,6 +13,8 @@ const FileStore = require('session-file-store');
 
 const store = FileStore(session);
 
+const MongoStore = require('connect-mongo');
+
 
 
 //configuration web socket 
@@ -66,6 +68,8 @@ let baseSession = session({
     saveUninitialized: false
 })
 
+
+
 // class chat
 const Manager = require('./controllers/chat.manager');
 const { application } = require('express');
@@ -82,6 +86,7 @@ app.use(session({
         path: './session',
         ttl:600000 //time to live
     })
+   
 }))
 
 app.use('/content', express.static('./src/public'))
@@ -93,9 +98,22 @@ app.engine('handlebars', handlebars.engine())
 app.set('views', __dirname+'/views') 
 app.set('view engine', 'handlebars')
 
+// app.get('/', (req, res) => {
+//     res.render('create-product')
+// })
+
 app.get('/', (req, res) => {
+    res.render('login')
+})
+
+app.get('/register',(req, res)=>{
+    res.render(`register`)
+})
+
+app.get('/create',(req, res)=>{
     res.render('create-product')
 })
+
 
 //path to routes
 app.use('/products', productRouter)
