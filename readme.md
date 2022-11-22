@@ -44,15 +44,17 @@ const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 ```javascript
 //session
 app.use(session({
-    store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS, mongoOptions: advancedOptions }),
-        // path: './session',
-        // ttl:600000 //time to live
+    store: MongoStore.create({ 
+        mongoUrl: proccess.env.DB_ATLAS,
+        mongoOptions: advancedOptions,
+        dbAtlas: 'sessions-24',
+        collectionName: 'session',
+        ttl: 120
+    }),
+        key: 'user_sid',
         secret: 'coder',
         resave:false,
         saveUninitialized: false,
-        cookie:{
-            maxAge: 60000
-        }
 }))
 
 ```

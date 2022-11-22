@@ -83,15 +83,20 @@ app.use(express.urlencoded({ extended:true }));
 
 //session
 app.use(session({
-    store: MongoStore.create({ mongoUrl: proccess.env.DB_ATLAS, mongoOptions: advancedOptions }),
-        // path: './session',
-        // ttl:600000 //time to live
+    store: MongoStore.create({ 
+        mongoUrl: proccess.env.DB_ATLAS,
+        mongoOptions: advancedOptions,
+        dbAtlas: 'sessions-24',
+        collectionName: 'session',
+        ttl: 120
+    }),
+        key: 'user_sid',
         secret: 'coder',
         resave:false,
         saveUninitialized: false,
-        cookie:{
-            maxAge: 60000
-        }
+        // cookie:{
+        //     maxAge: 60000
+        // }
 }))
 
 app.use('/content', express.static('./src/public'))
@@ -111,13 +116,20 @@ app.get('/', (req, res) => {
     res.render('login')
 })
 
-app.get('/register',(req, res)=>{
-    res.render(`register`)
-})
 
 app.get('/create',(req, res)=>{
-    res.render('create-product')
+    if(req.session.user && req.cookies.user_sid){
+        res.render('create-product',{
+            user: req.session.user.name, 
+            email: req.session.user.name})
+
+    }
+    else{ res.redirect('/')}
 })
+
+// app.get('/logout', (req, res) => {
+//     res.render('logout')
+// })
 
 
 //path to routes

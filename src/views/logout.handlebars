@@ -1,0 +1,9 @@
+<div class="container-fluid">
+<h2>Hasta la proxima</h2>
+</div>
+
+<script>
+    setTimeout(() => fetch('/session',{
+            method: 'DELETE'
+        }).then(location.href = '/'), 2000)
+</script>
