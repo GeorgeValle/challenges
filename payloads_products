@@ -1,0 +1,25 @@
+[
+    {
+        "title":"La Dama de la Laguna",
+        "price":400,
+        "thumbnail":"https://res.cloudinary.com/georgevalle/image/upload/v1665344853/thumbnails/books%20icons/libro1_png_weyjv1.png"
+    },
+
+    {
+        "title":"El Hijo Rebelde",
+        "price":500,
+        "thumbnail":"https://res.cloudinary.com/georgevalle/image/upload/v1665344853/thumbnails/books%20icons/libro2_png_sjjmmh.png"
+    },
+
+    {
+        "title":"El Rico sin Vista",
+        "price":600,
+        "thumbnail":"https://res.cloudinary.com/georgevalle/image/upload/v1665344853/thumbnails/books%20icons/libro3_png_nhkmmr.png"
+    },
+
+    {
+        "title":"El Rostro Contra la Pared",
+        "price":800,
+        "thumbnail":"https://res.cloudinary.com/georgevalle/image/upload/v1665344853/thumbnails/books%20icons/libro_4_png_iugoiq.png"
+    }
+]
