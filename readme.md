@@ -68,6 +68,163 @@ const sessionRouter = require('./routes/session.router')
 app.use('/session',sessionRouter)
 ```
 
+* En app, se crea una ruta raíz para derivar en la view login, pero antes redirije a route Session
+
+```javascript
+app.get('/', 
+    (req, res) => res.redirect('/session/login')   
+)
+```
+
+* en Session, ademas de express, se exporta el js SessionChecker que está en la carpeta models:
+
+```javascript
+const express = require('express');
+const route = express.Router();
+
+const sessionChecker =  require ('../models/sessionCheckers');
+``` 
+
+ * Este fiscaliza si hay session activa y en caso de ser así envía directamente a la vista "create.product"
+
+```javascript
+const sessionChecker = (req, res, next) => {
+    if(req.session.user && req.cookies.user_sid){
+        res.redirect('/create')
+    }
+    else {
+        next()
+    }
+}
+module.exports = sessionChecker
+``` 
+* En Route Session,  al get '/login' se le pasa sessionCheker para verificar si hay sesion activa. si no es así el next deriva a la vista 'login'
+
+```javascript
+route.get('/login', sessionChecker, (req, res) => {
+    res.render('login')
+})
+```
+## Vista Login
+
+* el formulario envia a la ruta /session con metodo Post el email y el usuario:
+
+```javascript
+<div class="container row">
+            <div class="jumbotron col-sm-4 pull-center">
+                <form autocomplete="off" action="/session" method="post">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input class="form-control" required type="text" name="username"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input class="form-control" required type="Email" name="Email"/>
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-primary" type="submit" value="Log In"/>
+                    </div>
+                </form>                  
+            </div>          
+        </div>
+```
+* este Post impacta en la ruta session:
+
+```javascript
+route.post('/', (req, res) => {
+    req.session.user = req.body
+    req.session.save(err => err && console.log(err))
+    res.redirect('/create')
+})
+```
+
+* esta ruta lleva a la direccion create que está en app.js y que manda a la vista create-product el user y el email:
+
+
+```javascript
+app.get('/create',(req, res)=>{
+    if(req.session.user && req.cookies.user_sid){
+        res.render('create-product',{
+            user: req.session.user.name, 
+            email: req.session.user.name})
+
+    }
+    else{ res.redirect('/')}
+})
+```
+## Vista Create-Product
+* Aquí se recibe el usuario y se continua con la carga de productos par el chat
+
+```javascript
+<div class="container-fluid flex mx-2">
+    <h2>Welcome </h2> 
+    <h2 id="userTitle">{{user}}</h2> 
+    <a href="/session/logout" style="text-decoration: none; color: inherit;">
+                <button type="button" class="btn btn-outline-success">Logout</button>
+    </a>
+</div> 
+<h2>Create a product</h2>
+<form id="productsForm">
+    <label>Title:</label>
+    <input name="title">
+    <label>Price:</label>
+    <input name="price">
+    <label>Thumbnail:</label>
+    <input name="thumbnail">
+    <input type="submit">
+</form>
+<hr />
+<div id="history">without products to show</div>
+<hr />
+<h2>Messages history</h2>
+<form id="chatForm">
+    <input name="email">
+    <div id="chatHistory">without messages to show</div>
+    <input name="message">
+    <input type="submit">
+</form>
+```
+
+* el boton logout de esta vista impacta en session, donde deslogea al enviarte a la vista logout y esta te redirige a la vista login :
+
+```javascript
+route.get('/logout', (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
+        res.render('logout', {user: req.session.user.name})
+    } else {
+        res.redirect('/login')
+    }
+})
+```
+* vista logout:
+
+```javascript
+<div class="container-fluid">
+<h2>Hasta la proxima</h2>
+</div>
+
+<script>
+    setTimeout(() => fetch('/session',{
+            method: 'DELETE'
+        }).then(location.href = '/'), 2000)
+</script>
+```
+
+* esta manda con un script el metodo delete de session que destruye la sesion.
+
+```javascript
+//delete the session
+route.delete('/', (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
+        req.session.destroy()
+    }
+    res.redirect('/login')
+})
+
+module.exports =  route
+```
+
+
 ## Creación de objeto Knex y tablas
 * se creó el script options ya instanciando un objeto knex para dar los métodos a cualquier parte que se exporte tanto MySQL como SQLITE.
 

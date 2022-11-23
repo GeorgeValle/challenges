@@ -84,7 +84,7 @@ app.use(express.urlencoded({ extended:true }));
 //session
 app.use(session({
     store: MongoStore.create({ 
-        mongoUrl: proccess.env.DB_ATLAS,
+        mongoUrl: process.env.DB_ATLAS,
         mongoOptions: advancedOptions,
         dbAtlas: 'sessions-24',
         collectionName: 'session',
@@ -112,9 +112,9 @@ app.set('view engine', 'handlebars')
 //     res.render('create-product')
 // })
 
-app.get('/', (req, res) => {
-    res.render('login')
-})
+app.get('/', 
+    (req, res) => res.redirect('/session/login')   
+)
 
 
 app.get('/create',(req, res)=>{

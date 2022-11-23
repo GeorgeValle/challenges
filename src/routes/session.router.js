@@ -3,9 +3,9 @@ const route = express.Router();
 
 const sessionChecker =  require ('../models/sessionCheckers');
 
-route.get('/login', sessionChecker, (req, res) => {
-    res.redirect('/login')
-})
+// route.get('/login', sessionChecker, (req, res) => {
+//     res.redirect('/login')
+// })
 
 route.get('/login', sessionChecker, (req, res) => {
     res.render('login')
@@ -17,6 +17,7 @@ route.post('/', (req, res) => {
     res.redirect('/create')
 })
 
+//logout
 route.get('/logout', (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.render('logout', {user: req.session.user.name})
@@ -26,7 +27,7 @@ route.get('/logout', (req, res) => {
 })
 
 
-//logout
+//delete the session
 route.delete('/', (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         req.session.destroy()
@@ -35,4 +36,4 @@ route.delete('/', (req, res) => {
     res.redirect('/login')
 })
 
-export default route
+module.exports =  route

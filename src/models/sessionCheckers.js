@@ -1,4 +1,5 @@
-export const sessionChecker = (req, res, next) => {
+
+const sessionChecker = (req, res, next) => {
     if(req.session.user && req.cookies.user_sid){
         res.redirect('/create')
     }
@@ -6,3 +7,5 @@ export const sessionChecker = (req, res, next) => {
         next()
     }
 }
+
+module.exports = sessionChecker
