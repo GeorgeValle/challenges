@@ -8,10 +8,10 @@ const Connection = require('../loaders/connection');
 
 
 const userSchema = new Schema({
+    // username: { 
+    //     type: String,
+    //     required: true },
     username: { 
-        type: String,
-        required: true },
-    email: { 
         type: String,
         unique: true,
         required: true},
@@ -19,7 +19,7 @@ const userSchema = new Schema({
     password: { 
         type: String,
         required: true},
-    date: {}
+    // date: {}
 })
 
 const userModel = mongoose.model('user', userSchema)

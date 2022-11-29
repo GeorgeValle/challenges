@@ -1,39 +1,79 @@
 const express = require('express');
 const route = express.Router();
+const passport =require ("passport");
 
-const sessionChecker =  require ('../models/sessionCheckers');
+// const sessionChecker =  require ('../models/sessionCheckers');
 
 // route.get('/login', sessionChecker, (req, res) => {
 //     res.redirect('/login')
 // })
 
-route.get('/login', sessionChecker, (req, res) => {
-    res.render('login')
+
+route.get('/', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.redirect('/login')
+    }
+    else{
+        res.redirect('/create')
+    }
 })
 
-route.post('/', (req, res) => {
-    req.session.user = req.body
-    req.session.save(err => err && console.log(err))
+route.get('/register', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.render('signup')
+    }
+    else {
+        res.redirect('/create')
+    }
+})
+
+
+route.post('/register', passport.authenticate('register', {
+    failureRedirect: '/failureRegister'}),
+(req, res) => {
+        res.redirect('/login') 
+}
+)
+
+route.get('/login', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.render('login')
+    }
+    else {
+        res.redirect('/create')
+    }
+})
+
+route.post('/login', passport.authenticate('login', { failureRedirect: '/failureLogin'}), (req, res) => {
     res.redirect('/create')
 })
 
-//logout
 route.get('/logout', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.render('logout', {user: req.session.user.name})
+    if (req.isAuthenticated()) {
+        res.render('logout', {user: req.user.username})
     } else {
         res.redirect('/login')
     }
 })
 
 
-//delete the session
-route.delete('/', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        req.session.destroy()
-        //res.clearCookie('user_sid')
+route.delete('/logout', (req, res) => {
+    if (req.isAuthenticated()) {
+            return res.redirect('/login')
     }
-    res.redirect('/login')
+    else{
+        return res.redirect('/login')
+    }
 })
+
+
+route.post('/failureLogin', (req, res) => {
+    res.render('fail-login')
+})
+
+route.post('/failureRegister', (req, res) => {
+    res.render('fail-register')
+})
+
 
 module.exports =  route

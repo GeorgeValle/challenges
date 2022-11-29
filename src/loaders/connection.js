@@ -2,7 +2,7 @@ const dotenv = require ('dotenv');
 dotenv.config();
 const mongoose = require ('mongoose');
 
-const uri= process.env.DB_ATLAS
+const uri= process.env.DB_MONGO//'mongodb://localhost/passport-auth' //process.env.DB_ATLAS||
 const ear= mongoose.connection;
 
 mongoose.connect(uri,
@@ -11,6 +11,7 @@ mongoose.connect(uri,
     useUnifiedTopology: true,
     // useCreateIndex: true,
     // useFindAndModify: false
+    dbName: 'passport-auth'
 }).catch(err => {console.log(err)});
 
 ear.once('open',_=>{

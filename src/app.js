@@ -16,7 +16,9 @@ const session= require('express-session');
 const MongoStore = require('connect-mongo');
 const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
+const passport = require('passport');
 
+const { registerStrategy, loginStrategy }= require ("./strategies/local");
 
 //configuration web socket 
 const {Server}= require('socket.io');
@@ -34,6 +36,8 @@ const createTable2 = require('./options/createTable2');
 let productsList= require('./models/product.models');
 //object knex for db sqlite
 const sqlite = require('./options/sqlite.config')
+
+
 
 
 
@@ -62,15 +66,6 @@ try{
 })
 
 
-// let baseSession = session({
-//     store: MongoStore.create({ mongoUrl: process.env.DB_ATLAS }),
-//     secret: 'c0d3r',
-//     resave: false,
-//     saveUninitialized: false
-// })
-
-
-
 // class chat
 const Manager = require('./controllers/chat.manager');
 const { application } = require('express');
@@ -84,9 +79,9 @@ app.use(express.urlencoded({ extended:true }));
 //session
 app.use(session({
     store: MongoStore.create({ 
-        mongoUrl: process.env.DB_ATLAS,
+        mongoUrl: process.env.DB_MONGO,//process.env.DB_ATLAS,
         mongoOptions: advancedOptions,
-        dbAtlas: 'sessions-24',
+        dbName: 'passport-auth',
         collectionName: 'session',
         ttl: 120
     }),
@@ -112,16 +107,24 @@ app.set('view engine', 'handlebars')
 //     res.render('create-product')
 // })
 
+
+passport.use('register', registerStrategy)
+passport.use('login', loginStrategy)
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+
 app.get('/', 
-    (req, res) => res.redirect('/session/login')   
+    (req, res) => res.redirect('/session')   
 )
 
 
 app.get('/create',(req, res)=>{
-    if(req.session.user && req.cookies.user_sid){
+    if(req.isAuthenticated()){
         res.render('create-product',{
-            user: req.session.user.name, 
-            email: req.session.user.name})
+            user: req.user.username, 
+            })
 
     }
     else{ res.redirect('/')}

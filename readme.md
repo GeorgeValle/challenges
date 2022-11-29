@@ -6,6 +6,7 @@
     "bcrypt": "^5.1.0",
     "connect-mongo": "^4.6.0",
     "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "express-handlebars": "^6.0.6",
@@ -17,10 +18,75 @@
     "nodemon": "^2.0.20",
     "parser": "^0.1.4",
     "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "session-file-store": "^1.5.0",
     "socket.io": "^4.5.2",
     "sqlite3": "^5.1.2"
   }
+```
+## Configuración de bcryp
+
+* dentro de la carpeta utils, en el archivo bcrypt.js se crea la config.
+
+```javascript
+const bcrypt = require ('bcrypt');
+
+const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+const isValid = (user, password) => bcrypt.compareSync(password, user.password);
+
+module.exports = {
+    createHash,
+    isValid
+}
+```
+
+## Configuracion de Passport
+
+* dentro de la carpeta strategies, en el archivo localjs. se coloca la config part exportar {registerStrategy, loginStrategy}:
+
+```javascript
+const LocalStrategy = require ('passport-local');
+const passport = require ('passport')
+const { userModel } = require ('../models/users')
+const { createHash, isValid } = require ('../utils/bcrypt')
+
+const registerStrategy = new LocalStrategy(async (username, password, cb) => {
+    try {
+        const user = await userModel.findOne({username})
+        if(user){ return cb(null, false, {message: 'User already exist'})}
+
+        const hash = createHash(password)
+        const newUser = await userModel.create({username, password: hash})
+
+        console.log(newUser)
+        return cb(null, newUser)
+    } catch (error) {
+        return cb(error)
+    }
+})
+
+const loginStrategy = new LocalStrategy(async (username, password, cb) => {
+    try {
+        const user = await userModel.findOne({username})
+        if(!user){ return cb(null, false, { message: 'User does not exist' })}
+
+        if(!isValid(user, password)){ return cb(null, false, { message: 'Wrong password' })}
+        
+        return cb(null, user)
+    } catch (error) {
+        return cb(error)
+    }
+})
+
+passport.serializeUser((user, cb) => {
+    cb(null, user._id)
+})
+
+passport.deserializeUser((id, cb) => {
+    userModel.findById(id, cb)
+})
+
+module.exports = {registerStrategy, loginStrategy};
 ```
 
 ## Configuracion de Mongo Store
@@ -47,9 +113,9 @@ const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 //session
 app.use(session({
     store: MongoStore.create({ 
-        mongoUrl: proccess.env.DB_ATLAS,
+        mongoUrl: process.env.DB_MONGO,//process.env.DB_ATLAS,
         mongoOptions: advancedOptions,
-        dbAtlas: 'sessions-24',
+        dbName: 'passport-auth',
         collectionName: 'session',
         ttl: 120
     }),
@@ -61,7 +127,7 @@ app.use(session({
 
 ```
 
-* se configura una ruta
+* se configura una ruta que gestiona las autenticaciones
 
 ```javascript
 //path route session
@@ -70,58 +136,84 @@ const sessionRouter = require('./routes/session.router')
 app.use('/session',sessionRouter)
 ```
 
-* En app, se crea una ruta raíz para derivar en la view login, pero antes redirije a route Session
+* En app, se crea una ruta raíz para derivar a route Session
 
 ```javascript
 app.get('/', 
-    (req, res) => res.redirect('/session/login')   
+    (req, res) => res.redirect('/session')   
 )
 ```
 
-* en Session, ademas de express, se exporta el js SessionChecker que está en la carpeta models:
+* en Session, ademas de express, se importa passport:
 
 ```javascript
 const express = require('express');
 const route = express.Router();
 
-const sessionChecker =  require ('../models/sessionCheckers');
+const passport =require ("passport");
+
 ``` 
 
- * Este fiscaliza si hay session activa y en caso de ser así envía directamente a la vista "create.product"
+ * En Route Session, su ruta raíz fiscaliza si hay sesion activa. si no es así  deriva a ruta'login':
 
-```javascript
-const sessionChecker = (req, res, next) => {
-    if(req.session.user && req.cookies.user_sid){
+ ```javascript
+route.get('/', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.redirect('/login')
+    }
+    else{
         res.redirect('/create')
     }
-    else {
-        next()
-    }
-}
-module.exports = sessionChecker
-``` 
-* En Route Session,  al get '/login' se le pasa sessionCheker para verificar si hay sesion activa. si no es así el next deriva a la vista 'login'
+})
+ ```
+
+* En Route Session,  al get '/login' se le pasa isAuthenticated() para verificar si no hay sesión activa para mandar a la vista login,  si hay sesión deriva a la dirección '/create' que es la del dashborad.
 
 ```javascript
-route.get('/login', sessionChecker, (req, res) => {
-    res.render('login')
+route.get('/login', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.render('login')
+    }
+    else {
+        res.redirect('/create')
+    }
 })
 ```
 ## Vista Login
 
-* el formulario envia a la ruta /session con metodo Post el email y el usuario:
+* el formulario envia a la ruta /session/login con metodo Post el email y el password:
 
 ```javascript
-<div class="container row">
+<div class="page-header">
+            <h1>Login Auth</h1>
+        </div>
+ 
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/session/register">Sign Up</a></li>
+                        <li><a href="/create">Dashboard</a></li>
+                    </ul>
+ 
+                    
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+ 
+        <div class="container row">
             <div class="jumbotron col-sm-4 pull-center">
-                <form autocomplete="off" action="/session" method="post">
-                    <div class="form-group">
-                        <label>Username:</label>
-                        <input class="form-control" required type="text" name="username"/>
-                    </div>
+            
+                <form autocomplete="off" action="/session/login" method="post">
                     <div class="form-group">
                         <label>Email:</label>
-                        <input class="form-control" required type="Email" name="Email"/>
+                        <input class="form-control" required type="email" name="username"/>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input class="form-control" required type="password" name="password"/>
                     </div>
                     <div class="form-group">
                         <input class="btn btn-primary" type="submit" value="Log In"/>
@@ -133,27 +225,124 @@ route.get('/login', sessionChecker, (req, res) => {
 * este Post impacta en la ruta session:
 
 ```javascript
-route.post('/', (req, res) => {
-    req.session.user = req.body
-    req.session.save(err => err && console.log(err))
+route.post('/login', passport.authenticate('login', { failureRedirect: '/failureLogin'}), (req, res) => {
     res.redirect('/create')
 })
 ```
 
-* esta ruta lleva a la direccion create que está en app.js y que manda a la vista create-product el user y el email:
+* Si esta todo bien, la ruta lleva a la direccion /create que está en app.js y que manda a la vista create-product el user:
 
 
 ```javascript
 app.get('/create',(req, res)=>{
-    if(req.session.user && req.cookies.user_sid){
+    if(req.isAuthenticated()){
         res.render('create-product',{
-            user: req.session.user.name, 
-            email: req.session.user.name})
+            user: req.user.username, 
+            })
 
     }
     else{ res.redirect('/')}
 })
 ```
+
+* pero si hay un error lo envia a la vista 'fail-login'
+
+```javascript
+<main class="container mt-3">
+        <div class="p-3 mt-4 bg-light bg-gradient">
+            <div class="d-flex justify-content-between align-items-center">
+                <p class="text-danger mb-0" >USER ERROR LOGIN</p>
+                <button class="btn btn-primary"><a href="/" style="text-decoration: none; color: inherit;">Back</a></button>
+            </div>
+        </div>
+    </main>
+```
+
+## Vista Signup
+* Se llega a través del link que hay en la vista login. Aquí el usuario carga su email y password. que impacta mediante post en session/register:
+
+```javascript
+route.get('/register', (req, res) => {
+    if (!req.isAuthenticated()) {
+        res.render('signup')
+    }
+    else {
+        res.redirect('/create')
+    }
+})
+```
+
+```javascript
+<div class="page-header">
+            <h1>Signup Auth</h1>
+        </div>
+ 
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                    
+                        <li><a href="/session/login">Log IN</a></li>
+                        <li><a href="/create">Dashboard</a></li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+        <div class="container row">
+            <div class="jumbotron col-sm-4 pull-center">
+                <form autocomplete="off" action="/session/register" method="post">
+                    <div class="form-group">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input class="form-control" required type="email" name="username"/>
+                    </div>    
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input class="form-control" required type="password" name="password"/>
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-primary" type="submit" value="Sign Up"/>
+                    </div>
+                </form>                  
+            </div>          
+        </div>
+```
+
+este Post impacta en la ruta session /register. si se crea el usuario te redirige al logind si no a la vista fail-register :
+
+```javascript
+route.post('/register', passport.authenticate('register', {
+    failureRedirect: '/failureRegister'}),
+(req, res) => {
+        res.redirect('/login') 
+}
+)
+```
+
+* fail register
+
+```javascript
+route.post('/failureRegister', (req, res) => {
+    res.render('fail-register')
+})
+```
+
+```javascript
+<main class="container mt-3">
+        <div class="p-3 mt-4 bg-light bg-gradient">
+            <div class="d-flex justify-content-between align-items-center">
+                <p class="text-danger mb-0" >USER ERROR SIGNUP</p>
+                <button class="btn btn-primary"><a href="/" style="text-decoration: none; color: inherit;">Back</a></button>
+            </div>
+        </div>
+    </main>
+```
+
+
+
 ## Vista Create-Product
 * Aquí se recibe el usuario y se continua con la carga de productos par el chat
 
@@ -191,8 +380,8 @@ app.get('/create',(req, res)=>{
 
 ```javascript
 route.get('/logout', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.render('logout', {user: req.session.user.name})
+    if (req.isAuthenticated()) {
+        res.render('logout', {user: req.user.username})
     } else {
         res.redirect('/login')
     }
@@ -203,6 +392,7 @@ route.get('/logout', (req, res) => {
 ```javascript
 <div class="container-fluid">
 <h2>Hasta la proxima</h2>
+<h3>{{user}}</h3>
 </div>
 
 <script>
@@ -216,12 +406,15 @@ route.get('/logout', (req, res) => {
 
 ```javascript
 //delete the session
-route.delete('/', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        req.session.destroy()
+route.delete('/logout', (req, res) => {
+    if (req.isAuthenticated()) {
+            return res.redirect('/login')
     }
-    res.redirect('/login')
+    else{
+        return res.redirect('/login')
+    }
 })
+
 
 module.exports =  route
 ```
