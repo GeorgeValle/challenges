@@ -6,13 +6,19 @@ dotenv.config();
 
 const connection= require ('./loaders/connection');
 
+// Yargs
+const yargs = require('yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+const port = argv.port || 8080
+// end of yargs
+
+
 //server Express
 const express = require('express');
 const session= require('express-session');
-// const FileStore = require('session-file-store');
 
-// const store = FileStore(session);
-
+//mongo
 const MongoStore = require('connect-mongo');
 const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
@@ -27,6 +33,7 @@ const handlebars = require('express-handlebars');
 
 const productRouter = require('./routes/product.router');
 const chatRouter = require('./routes/chat.router');
+
 //path route session
 const sessionRouter = require('./routes/session.router')
 
@@ -34,20 +41,21 @@ const createTable1 = require('./options/createTable1');
 const createTable2 = require('./options/createTable2');    
 
 let productsList= require('./models/product.models');
+
 //object knex for db sqlite
 const sqlite = require('./options/sqlite.config')
 
 
 
 
-
+//star server
 const app = express();
-const PORT = process.env.PORT||8080;
+//const PORT = process.env.PORT||8080;
 
 const tbl_Products ="products";
 const tbl_chats = "chats";
 
-const server = app.listen(PORT, async ()=>{
+const server = app.listen(port, async ()=>{
     console.log(`listening on port ${PORT}`)
     //table whit MySQl
 try{
@@ -103,10 +111,6 @@ app.engine('handlebars', handlebars.engine())
 app.set('views', __dirname+'/views') 
 app.set('view engine', 'handlebars')
 
-// app.get('/', (req, res) => {
-//     res.render('create-product')
-// })
-
 
 passport.use('register', registerStrategy)
 passport.use('login', loginStrategy)
@@ -129,11 +133,6 @@ app.get('/create',(req, res)=>{
     }
     else{ res.redirect('/')}
 })
-
-// app.get('/logout', (req, res) => {
-//     res.render('logout')
-// })
-
 
 //path to routes
 app.use('/products', productRouter)
