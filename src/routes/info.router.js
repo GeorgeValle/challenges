@@ -7,21 +7,21 @@ const yargs = require('yargs');
 // nombre de la plataforma + process.plataform
 // version de Node.js + process.version
 // memoria total reservada rss
-// path de ejecucion + process.execPath
+// path de ejecución + process.execPath
 // process Id + process.pid
 // carpeta del proyecto + process.cwd()
 
 route.get('/info', (req, res) => {
         // res.render('info')
-        res.send({
-            argumentos: yargs.argv,    
-            plataforma: process.platform,
-            node_version: process.version,
-            memoria_rss: process.memoryUsage().rss,
+        res.render('info', {
+            argvs: process.argv.slice(2),
+            platform: process.platform,
+            node: process.version,
+            memory: process.memoryUsage().rss,
             path: process.execPath,
-            pid: process.pid, 
-            carpeta: process.cwd()
-        })  
+            pid: process.pid,
+            folder: process.cwd()
+        })
     }
 )
 

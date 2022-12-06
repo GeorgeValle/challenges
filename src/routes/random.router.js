@@ -11,4 +11,4 @@ router.get('/', async (req, res) => {
     })
 })
 
-module.exports = {randomRouter: router}
+module.exports =  router

@@ -40,6 +40,173 @@ module.exports = {
 }
 ```
 
+## configuarción de Yargs
+
+* App.js se  configura la librería Yargs para recibir parametros por consola, y el puerto se inicia por el numero que mandamos por consola.
+
+```javascript
+const yargs = require('yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+const port = argv.port || 8080
+
+
+const server = app.listen(port, async ()=>{
+    console.log(`listening on port ${port}`)
+```
+
+* Configuración de la ruta:
+
+```javascript
+const infoRouter = require('./routes/info.router');
+
+
+app.use('/info', infoRouter)
+
+```
+
+* info router, donde crea un objeto que envia a la view info. para ver todos los datos requeridos:
+
+
+```javascript
+const express = require('express');
+const route = express.Router();
+
+const yargs = require('yargs');
+
+
+route.get('/info', (req, res) => {
+        // res.render('info')
+        res.render('info', {
+            argvs: process.argv.slice(2),
+            platform: process.platform,
+            node: process.version,
+            memory: process.memoryUsage().rss,
+            path: process.execPath,
+            pid: process.pid,
+            folder: process.cwd()
+        })
+    }
+)
+
+
+module.exports =route;
+```
+* view info:
+
+```javascript
+<div class="modal position-static d-block bg-secondary py-5" tabindex="-1" role="dialog" id="modalLogin" style="height: 100vh;">
+    <div class="modal-dialog" role="document" style="max-width: 800px;">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h3 class="fw-bold mb-0">Información de la plataforma</h3>
+            </div>
+
+            <div class="modal-body p-5 pt-0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Item</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>argvs</td>
+                            <td>{{argvs}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>platform</td>
+                            <td>{{platform}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>node</td>
+                            <td>{{node}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>memory</td>
+                            <td>{{memory}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>path</td>
+                            <td>{{path}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>pid</td>
+                            <td>{{pid}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>folder</td>
+                            <td>{{folder}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="/" class="w-100 mb-2 btn btn-lg rounded-3 btn-success">Volver a inicio</a>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+* use route random:
+
+```javascript
+const randomRouter = require('./routes/random.router');
+
+
+app.use('/random', randomRouter);
+```
+
+* random router js que a su vez importa la logia modularizada para enviarla al front:
+
+```javascript
+const express = require('express')
+const router = express.Router()
+const {fork} = require('child_process')
+const child = fork('../utils/randomGenerator.js')
+
+router.get('/', async (req, res) => {
+    const rounds = req.query.cant || 100000000
+    child.send(rounds)
+    child.on('message', (msg) => {
+        res.end(msg)
+    })
+})
+
+module.exports =  router
+```
+
+* La lógica del random generator que se encuentra en la carpeta utils:
+
+```javascript
+function randomGenerator(qty) {
+
+    let rndList = {}
+    for (let num=0; num <= qty; num++) {
+        let rndNum = parseInt(Math.random() * (1000 - 1) + 1)
+        if (rndList.hasOwnProperty(rndNum)) {
+            rndList[rndNum] += 1
+        } else {
+            rndList[rndNum] = 1
+        }
+    }
+    return JSON.stringify(rndList)
+}
+
+process.on('message', (msg => {
+    const rndList = randomGenerator(parseInt(msg))
+    process.send(rndList)
+}))
+```
+
 ## Configuracion de Passport
 
 * dentro de la carpeta strategies, en el archivo localjs. se coloca la config part exportar {registerStrategy, loginStrategy}:

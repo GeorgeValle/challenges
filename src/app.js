@@ -31,9 +31,11 @@ const {Server}= require('socket.io');
 
 const handlebars = require('express-handlebars');
 
+//routes
 const productRouter = require('./routes/product.router');
 const chatRouter = require('./routes/chat.router');
-
+const infoRouter = require('./routes/info.router');
+const randomRouter = require('./routes/random.router');
 //path route session
 const sessionRouter = require('./routes/session.router')
 
@@ -56,7 +58,7 @@ const tbl_Products ="products";
 const tbl_chats = "chats";
 
 const server = app.listen(port, async ()=>{
-    console.log(`listening on port ${PORT}`)
+    console.log(`listening on port ${port}`)
     //table whit MySQl
 try{
     await createTable1(tbl_Products)
@@ -138,6 +140,8 @@ app.get('/create',(req, res)=>{
 app.use('/products', productRouter)
 app.use('/chat', chatRouter)
 app.use('/session',sessionRouter)
+app.use('/info', infoRouter)
+app.use('/random', randomRouter);
 
 //event connection
 io.on('connection', socket => {
