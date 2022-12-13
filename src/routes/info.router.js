@@ -20,7 +20,8 @@ route.get('/info', (req, res) => {
             memory: process.memoryUsage().rss,
             path: process.execPath,
             pid: process.pid,
-            folder: process.cwd()
+            folder: process.cwd(),
+            cpus: processor_count
         })
     }
 )

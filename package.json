@@ -1,7 +1,7 @@
 {
-  "name": "desafio-12",
+  "name": "desafio-30",
   "version": "1.0.0",
-  "description": "challenge class 24, sessions",
+  "description": "challenge class 30, Nginx and Proxy",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "cluster": "^0.7.7",
     "connect-mongo": "^4.6.0",
     "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
