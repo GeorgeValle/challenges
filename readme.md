@@ -1,4 +1,4 @@
-# Pasos Hechos en Desafio Process (spanish) 
+# Pasos Hechos en Desafio Ngix and proxy (spanish) 
 
 ## Dependencias
 ```javascript
