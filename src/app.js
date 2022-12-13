@@ -6,11 +6,18 @@ dotenv.config();
 
 const connection= require ('./loaders/connection');
 
+//Cluster
+const cluster = require('cluster');
+
+//CPUs 
+const processor_count = require('os').cpus().length;
+
 // Yargs
 const yargs = require('yargs')
 const { hideBin } = require('yargs/helpers')
 const argv = yargs(hideBin(process.argv)).argv
 const port = argv.port || 8080
+const mode = argv.mode || 'fork'
 // end of yargs
 
 
@@ -50,7 +57,31 @@ const sqlite = require('./options/sqlite.config')
 
 
 
-//star server
+// Server Cluster / Fork
+if (cluster.isPrimary) {
+    console.log(`Cantidad de núcleos disponibles: ${processor_count}`)
+    console.log(`Hilo principal en el proceso PID: ${process.pid}`)
+    // Cluster
+    if (mode === 'cluster') {
+        for (let i = 0; i < processor_count; i++) {
+            cluster.fork()
+        }
+        cluster.on('exit', (worker, code, signal) => {
+            console.log(`Worker ${worker.process.pid} terminó.`)
+            console.log('Iniciando otro worker...')
+            cluster.fork()
+        })
+    } else {
+        cluster.fork()
+        cluster.on('exit', (worker, code, signal) => {
+            console.log(`Worker ${worker.process.pid} terminó.`)
+            console.log('Iniciando otro worker...')
+            cluster.fork()
+        })
+    }
+} else {
+
+//star server Express
 const app = express();
 //const PORT = process.env.PORT||8080;
 
@@ -156,4 +187,4 @@ io.on('connection', socket => {
         io.emit('chatHistory', data)
     })
 })
-
+}
