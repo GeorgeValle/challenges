@@ -1,59 +1,8 @@
 # Pasos Hechos en Desafio Ngix and proxy (spanish) 
 
-## Dependencias
-```javascript
-   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "connect-mongo": "^4.6.0",
-    "cookie": "^0.5.0",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.1",
-    "express-handlebars": "^6.0.6",
-    "express-session": "^1.17.3",
-    "knex": "^2.3.0",
-    "mongodb": "^4.11.0",
-    "moongose": "^1.0.0",
-    "mysql": "^2.18.1",
-    "nodemon": "^2.0.20",
-    "parser": "^0.1.4",
-    "passport": "^0.6.0",
-    "passport-local": "^1.0.0",
-    "session-file-store": "^1.5.0",
-    "socket.io": "^4.5.2",
-    "sqlite3": "^5.1.2"
-  }
-```
-## Configuración de bcryp
+## Consignas:
 
-* dentro de la carpeta utils, en el archivo bcrypt.js se crea la config.
-
-```javascript
-const bcrypt = require ('bcrypt');
-
-const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-const isValid = (user, password) => bcrypt.compareSync(password, user.password);
-
-module.exports = {
-    createHash,
-    isValid
-}
-```
-
-## configuarción de Yargs
-
-* App.js se  configura la librería Yargs para recibir parametros por consola, y el puerto se inicia por el numero que mandamos por consola.
-
-```javascript
-const yargs = require('yargs')
-const { hideBin } = require('yargs/helpers')
-const argv = yargs(hideBin(process.argv)).argv
-const port = argv.port || 8080
-
-
-const server = app.listen(port, async ()=>{
-    console.log(`listening on port ${port}`)
-```
+### numero de procesadores:
 
 * Configuración de la ruta:
 
@@ -85,6 +34,8 @@ route.get('/info', (req, res) => {
             path: process.execPath,
             pid: process.pid,
             folder: process.cwd()
+            //para ver los procesadores
+            cpus: processor_count
         })
     }
 )
@@ -92,7 +43,7 @@ route.get('/info', (req, res) => {
 
 module.exports =route;
 ```
-* view info:
+* view info (con el añadido de los 8 nucleos):
 
 ```javascript
 <div class="modal position-static d-block bg-secondary py-5" tabindex="-1" role="dialog" id="modalLogin" style="height: 100vh;">
@@ -147,6 +98,11 @@ module.exports =route;
                             <td>folder</td>
                             <td>{{folder}}</td>
                         </tr>
+                         <tr>
+                            <th scope="row">8</th>
+                            <td>cpu count</td>
+                            <td>{{cpus}}</td>
+                        </tr>
                     </tbody>
                 </table>
                 <a href="/" class="w-100 mb-2 btn btn-lg rounded-3 btn-success">Volver a inicio</a>
@@ -155,6 +111,93 @@ module.exports =route;
     </div>
 </div>
 ```
+
+### Consigna: Ejecutar el servidor  (modo Fork y cluster) con nodemon
+
+```javascript
+    'nodemon ./src/app.js --mode=cluster' //(ejecuta en modo cluster)
+    'nodemon ./src/app.js --mode=fork' //(ejecuta modo fork)
+    'nodemon ./src/app.js' //(ejecuta modo fork por defecto)
+```
+en el caso de Forever solo cambia ndemon por forever y para las lista 'forever list'
+
+### consigna: Ejecutar el servidor (con los parámetros adecuados: modo fork) utilizando PM2 en sus modos fork y cluster. Listar los procesos por PM2 y por sistema operativo
+
+```javascript
+'pm2 start ./src/app.js --name="nodeServerFork"' //para inciar en modo Fork de PM2
+
+'pm2 start ./src/app.js --name="nodeServerCluster" -i max' // para iniciar en modo Cluster de PM2 utilizando todos los núcleos
+```
+### Consigna: PM2 permitir el modo escucha, para que la actualización del código del servidor se vea reflejado inmediatamente en todos los procesos
+
+```javascript
+'pm2 start server.js --name="nodeServerCluster" --watch -i max' // agregamos el parámetro --watch para permitir el modo watch o escucha
+```
+
+### consigna: Hacer pruebas de finalización de procesos Fork y Cluster en los casos que corresponda
+
+Realizado con 'kill' sobre los procesos hijos, en  pm2 no observo un proceso padre como sucede con nodemon, pues este último arroja una advertencia de crasheo y no incia automáticamente
+
+
+
+## Dependencias
+```javascript
+   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "connect-mongo": "^4.6.0",
+    "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "express-handlebars": "^6.0.6",
+    "express-session": "^1.17.3",
+    "knex": "^2.3.0",
+    "mongodb": "^4.11.0",
+    "moongose": "^1.0.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "parser": "^0.1.4",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "session-file-store": "^1.5.0",
+    "socket.io": "^4.5.2",
+    "sqlite3": "^5.1.2"
+  }
+```
+
+
+## Configuración de bcryp
+
+* dentro de la carpeta utils, en el archivo bcrypt.js se crea la config.
+
+```javascript
+const bcrypt = require ('bcrypt');
+
+const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+const isValid = (user, password) => bcrypt.compareSync(password, user.password);
+
+module.exports = {
+    createHash,
+    isValid
+}
+```
+
+## configuarción de Yargs
+
+* App.js se  configura la librería Yargs para recibir parametros por consola, y el puerto se inicia por el numero que mandamos por consola.
+
+```javascript
+const yargs = require('yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+const port = argv.port || 8080
+
+
+const server = app.listen(port, async ()=>{
+    console.log(`listening on port ${port}`)
+```
+
+
 
 * use route random:
 
