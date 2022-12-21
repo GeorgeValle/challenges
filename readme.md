@@ -131,13 +131,29 @@ en el caso de Forever solo cambia ndemon por forever y para las lista 'forever l
 ### Consigna: PM2 permitir el modo escucha, para que la actualización del código del servidor se vea reflejado inmediatamente en todos los procesos
 
 ```javascript
-'pm2 start server.js --name="nodeServerCluster" --watch -i max' // agregamos el parámetro --watch para permitir el modo watch o escucha
+'pm2 start ./src/app.js --name="nodeServerCluster" --watch -i max' // agregamos el parámetro --watch para permitir el modo watch o escucha
 ```
 
 ### consigna: Hacer pruebas de finalización de procesos Fork y Cluster en los casos que corresponda
 
 Realizado con 'kill' sobre los procesos hijos, en  pm2 no observo un proceso padre como sucede con nodemon, pues este último arroja una advertencia de crasheo y no incia automáticamente
 
+### consigna: Configurar nginx para balancear cargas en nuestro servidor de la siguiente manera
+
+* Redirigir todas las consultas a /api/randoms a un cluster de servidores escuchando en el puerto 8081. El cluster será creado en node utilizando el módulo nativo cluster
+
+Inicio el servidor random en modo cluster con 'pm2 start random.js --name=ramdomCluster --watch -- --port=8081 --mode=cluster'
+
+* El resto de consultas, redirigirlas a un servidor individual escuchando en el puerto 8080
+
+Inicio el servidor general en modo fork con 'pm2 start index.js --name=serverFork --watch -- --port=8080'
+
+* Verificar que todo funcione correctamente
+Inicio nginx utilizando la configuración 'nginx/nginx_nodecluster.conf', funciona el servidor general informando que es un servidor express, el PID y la hora local. El servidor random responde informando el ID del worker además de los números random para confirmar que estamos ante un cluster.
+
+* Luego, modificar la configuración para que todas las consultas a /api/randoms sean dirigidas a un cluster de servidores gestionado desde nginx, repartiendolas equitativamente entre 4 instancias escuchando en los puertos 8082, 8083, 8084 y 8085 respectivamente
+
+Para esta prueba el servidor general se mantiene igual que antes y se inicia de la misma forma, pero en el servidor random se incian cuatro instancias 'pm2 start random.js --name=ramdomCluster --watch -- --port=8082' cambiando el número de puerto para que sean 8082, 8083, 8084 y 8085. Sin especificar el modo cluster para que por defecto inicie cada uno en modo fork. Para esta prueba nginx utilizará la configuración del archivo './src/nginx/nginx.conf' el cual se comento el servidor random en el puerto 8081 y se sumaron los otros servidores sin definir para que nginx haga el balance de carga equitativo.
 
 
 ## Dependencias
@@ -248,6 +264,124 @@ process.on('message', (msg => {
     const rndList = randomGenerator(parseInt(msg))
     process.send(rndList)
 }))
+```
+
+## Configuración del servidor cluster / fork en app.js
+
+```javascript
+//Cluster
+const cluster = require('cluster');
+
+//CPUs 
+const processor_count = require('os').cpus().length;
+
+// Server Cluster / Fork
+if (cluster.isPrimary) {
+    console.log(`Cantidad de núcleos disponibles: ${processor_count}`)
+    console.log(`Hilo principal en el proceso PID: ${process.pid}`)
+    // Cluster
+    if (mode === 'cluster') {
+        for (let i = 0; i < processor_count; i++) {
+            cluster.fork()
+        }
+        cluster.on('exit', (worker, code, signal) => {
+            console.log(`Worker ${worker.process.pid} terminó.`)
+            console.log('Iniciando otro worker...')
+            cluster.fork()
+        })
+    } else {
+        cluster.fork()
+        cluster.on('exit', (worker, code, signal) => {
+            console.log(`Worker ${worker.process.pid} terminó.`)
+            console.log('Iniciando otro worker...')
+            cluster.fork()
+        })
+    }
+} else {/*servidor por default*/}
+```
+## config de Nginx
+
+* Dos Archivos: 1-  nginx_nodecluster.conf  2- nginx.conf
+```javascript
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+    }
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    upstream node_server {
+        server 127.0.0.1:8080;
+    }
+
+    upstream node_random {
+        #server 127.0.0.1:8081;
+        server 127.0.0.1:8082;
+        server 127.0.0.1:8083;
+        server 127.0.0.1:8084;
+        server 127.0.0.1:8085;
+    }
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            proxy_pass http://node_server;
+        }
+
+        location /api/random   {
+            proxy_pass http://node_random;
+        }
+
+    }
+}
+```
+
+```javascript
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    upstream node_server {
+        server 127.0.0.1:8080;
+    }
+
+    upstream node_random {
+        server 127.0.0.1:8081;
+    }
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            proxy_pass http://node_server;
+        }
+
+        location /api/random   {
+            proxy_pass http://node_random;
+        }
+
+    }
+}
 ```
 
 ## Configuracion de Passport
