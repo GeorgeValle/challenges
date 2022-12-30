@@ -25,6 +25,9 @@ const mode = argv.mode || 'fork'
 const express = require('express');
 const session= require('express-session');
 
+//Compression
+const compression = require('compression');
+
 //mongo
 const MongoStore = require('connect-mongo');
 const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
@@ -32,6 +35,10 @@ const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 const passport = require('passport');
 
 const { registerStrategy, loginStrategy }= require ("./strategies/local");
+
+
+//middleware Compression
+app.use(compression())
 
 //configuration web socket 
 const {Server}= require('socket.io');
@@ -53,6 +60,8 @@ let productsList= require('./models/product.models');
 
 //object knex for db sqlite
 const sqlite = require('./options/sqlite.config')
+
+
 
 
 
@@ -135,7 +144,11 @@ app.use(session({
         // }
 }))
 
+//middleware Compression
+app.use(compression())
+
 app.use('/content', express.static('./src/public'))
+
 
 
 //views client side
