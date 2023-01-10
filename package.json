@@ -1,0 +1,44 @@
+{
+  
+  "dependencies": {
+  
+    
+  "dotenv": "^16.0.3",
+  
+    
+  "express": "^4.18.1",
+  
+    
+  "mongoose": "^6.6.5",
+  
+    
+  "nodemon": "^2.0.20"
+  
+  },
+  
+  "name": "second-instalment",
+  
+  "version": "1.0.0",
+  
+  "main": "app.js",
+  
+  "type": "module",
+  
+  "scripts": {
+  
+    
+  "start": "node src/app.js",
+  
+    
+  "test": "echo \"Error: no test specified\" && exit 1"
+  
+  },
+  
+  "keywords": [],
+  
+  "author": "George-Valley",
+  
+  "license": "ISC",
+  
+  "description": "create Cart and Product list connected whit Mongodb and Firebase"
+}
