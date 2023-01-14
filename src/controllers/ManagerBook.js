@@ -10,7 +10,7 @@ class Book{
         if(!product.name||!product.price||!product.stock||!product.description||!product.code||!product.thumbnail) return{status:400, message: "all data fields is required"};
     }
 
-    async save(req, res) {
+    async saveData(req, res) {
     try{    
         //validations
        //this.validationsProduct(req.body);

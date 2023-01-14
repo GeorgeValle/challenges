@@ -19,7 +19,7 @@ routes.get('/health', (req, res) => {
 })
 
 //create a new instance of the managerBook
-routes.post('/',book.save)
+routes.post('/',book.saveData)
 
 //get all books
 routes.get('/', book.getAll)

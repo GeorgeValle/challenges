@@ -1,4 +1,4 @@
-# Pasos Hechos  segunda entrega(spanish) 
+# Pasos Hechos tercer entrega(spanish) 
 
 ## Dependencias
 ```javascript
@@ -19,7 +19,7 @@
 ```
 
 
-## utilización con el storage MongoDB a trtavés del framework Moongoose
+## utilización con el storage MongoDB a través del framework Moongoose
 
 ### Creación de conexión con Mongoose
 

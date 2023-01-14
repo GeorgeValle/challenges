@@ -5,7 +5,7 @@ import book from './ManagerBook.js';
 class Cart{
 
     //receive a id of product
-    save= async (req, res) => {
+    saveData= async (req, res) => {
         //validations
         try{
             
@@ -68,7 +68,7 @@ class Cart{
             const { id_prod } = req.params;
             if (!id_prod) return res.status(400).json( {message: "Product Id required"});
             const deleted = await CartModel.updateOne({_id: id}, {$pull: {products: id_prod }})
-            await CartModel.save();
+            await CartModel.save;
             return res.status(200).json({ message: 'Product deleted!', data: deleted})
             }catch(err) {
                     console.log(err);
