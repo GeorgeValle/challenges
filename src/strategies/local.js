@@ -1,15 +1,15 @@
 import LocalStrategy from 'passport-local';
 import passport from 'passport';
-import { userModel } from '../models/users';
+import { userModel } from '../models/Users';
 import { createHash, isValid } from '../utils/bcrypt';
 
-const registerStrategy = new LocalStrategy(async (username, password, cb) => {
+const registerStrategy = new LocalStrategy(async (email, password,name, address, age, phone, avatar, cb) => {
     try {
-        const user = await userModel.findOne({username})
+        const user = await userModel.findOne({email})
         if(user){ return cb(null, false, {message: 'User already exist'})}
 
         const hash = createHash(password)
-        const newUser = await userModel.create({username, password: hash})
+        const newUser = await userModel.create({email, password: hash, name, address, age, phone, avatar})
 
         console.log(newUser)
         return cb(null, newUser)
@@ -18,9 +18,9 @@ const registerStrategy = new LocalStrategy(async (username, password, cb) => {
     }
 })
 
-const loginStrategy = new LocalStrategy(async (username, password, cb) => {
+const loginStrategy = new LocalStrategy(async (email, password, cb) => {
     try {
-        const user = await userModel.findOne({username})
+        const user = await userModel.findOne({email})
         if(!user){ return cb(null, false, { message: 'User does not exist' })}
 
         if(!isValid(user, password)){ return cb(null, false, { message: 'Wrong password' })}
