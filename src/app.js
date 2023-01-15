@@ -11,13 +11,14 @@ import passport from 'passport';
 import { registerStrategy, loginStrategy } from "./strategies/local";
 
 import session from 'express-session';
-
+//import MongoStore
+import connection from './loaders/connection'
 import MongoStore from 'connect-mongo';
 const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
 //import routes
-import {productRouter} from './router/Productsrouter.js';
-import {cartRouter} from './router/Cartsrouter.js';
+import {productRouter} from './routes/Productsrouter.js';
+import {cartRouter} from './routes/Cartsrouter.js';
 
 //configure express
 const app = express();
