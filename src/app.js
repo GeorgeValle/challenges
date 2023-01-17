@@ -5,6 +5,10 @@ dotenv.config();
 //server Express
 import express from 'express';
 
+//import fork o cluster from Express
+import cluster from 'cluster'
+import { cpus } from 'os'
+
 
 //import of passport
 import passport from 'passport';
@@ -25,11 +29,41 @@ import {productRouter} from './routes/ProductsRouter.js';
 import {cartRouter} from './routes/CartsRouter.js';
 import {sessionRouter} from './routes/SessionRouter.js';
 
-//configure express
-const app = express();
-const PORT = process.env.PORT||8080;
 
-const server = app.listen(PORT,()=> console.log(`listening on ${PORT}`));
+
+//const PORT = process.env.PORT||8080;
+
+//configuration of port whit fork o cluster mode
+const PORT = parseInt(process.argv[2]) || 8080
+const modoCluster = process.argv[3] == 'CLUSTER'
+
+//configure express
+//const app = express();
+const app = express();
+
+if (modoCluster && cluster.isPrimary) {
+    const numCPUs = cpus().length
+
+    console.log(`Número de procesadores: ${numCPUs}`)
+    console.log(`PID MASTER ${process.pid}`)
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork()
+    }
+
+    cluster.on('exit', worker => {
+        console.log('Worker', worker.process.pid, 'died', new Date().toLocaleString())
+        cluster.fork()
+    })
+} else {
+    //const app = express()
+
+
+
+const server = app.listen(PORT,()=>{
+    console.log(`listening on ${PORT}`)
+    console.log(`PID WORKER ${process.pid}`)
+});
 
 server.on('error', error => console.log(`error in server: ${error} `));
 
@@ -117,6 +151,7 @@ app.use((error, req , res, next)=>{
 	})
 })
 
+}
 
 
 
