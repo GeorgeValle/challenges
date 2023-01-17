@@ -85,7 +85,6 @@ route.post('/failureRegister', (req, res) => {
 
 route.get('/create',(req, res)=>{
     if(req.isAuthenticated()){
-        book.
         res.render('dashboard',{
             user: req.user.name, avatar: req.user.avatar
             })

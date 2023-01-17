@@ -2,6 +2,7 @@ import passport from 'passport';
 import local from 'passport-local';
 import { userModel } from '../models/Users.js';
 import { createHash, isValid } from '../utils/bcrypt.js';
+import {createUserValidation} from '../utils/Validations.js';
 
 const LocalStrategy = local.Strategy;
 
@@ -22,6 +23,12 @@ export const initializePassport = () => {
                         age: req.body.age,
                         phone: req.body.phone,
                         avatar: req.body.avatar
+                    }
+                    try{
+                        createUserValidation(newUser)
+                    }
+                    catch(err){
+                        return done(null,false, { message: err.message })
                     }
                     try {
                         let result = await userModel.create(newUser)

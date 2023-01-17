@@ -30,7 +30,10 @@
   "passport": "^0.6.0",
   
     
-  "passport-local": "^1.0.0"
+  "passport-local": "^1.0.0",
+  
+    
+  "yup": "^0.32.11"
   
   },
   
