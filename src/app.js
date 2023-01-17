@@ -110,7 +110,12 @@ app.use((req, res) => {
     res.status(404).send({error: -2, description: `route ${req.baseUrl}${req.url} method ${req.method} not implemented`});
 });
 
-
+app.use((error, req , res, next)=>{
+	res.status(400).json({
+		status: 'error',
+		message: error.message
+	})
+})
 
 
 

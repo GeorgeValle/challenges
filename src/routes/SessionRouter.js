@@ -1,6 +1,7 @@
 import express from 'express';
 const route = express.Router();
 import passport from "passport";
+import {logger} from '../utils/Logger.js'
 
 
 
@@ -27,7 +28,7 @@ route.get('/register', (req, res) => {
 route.post('/register', passport.authenticate('register', {
     failureRedirect: 'failureRegister/'}),
 (req, res) => {
-        
+        logger.info(`se creó el usuario ${req.body.username}  ruta session/register`)
         res.render('login') 
 }
 )
@@ -48,7 +49,8 @@ route.post('/login', passport.authenticate('login', { failureRedirect: 'failureL
 
 route.get('/logout', (req, res) => {
     if (req.isAuthenticated()) {
-        res.render('logout', {user: req.user.name})
+        logger.info(`El usuario ${req.user.username} se ha deslogeado en ruta get logout`)
+        res.render('logout',{user: req.user.name})
     } else {
         res.redirect('/session/login')
     }
@@ -68,6 +70,7 @@ route.delete('/logout', function(req, res) {
 
 
 route.get('/failureLogin', (req, res) => {
+    logger.warn(`intento fallido de loggin`)
     res.render('fail-login')
 })
 
@@ -76,6 +79,7 @@ route.post('/failureLogin', (req, res) => {
 })
 
 route.get('/failureRegister', (req, res) => {
+    logger.error(`intento fallido de registro`)
     res.render('fail-register')
 })
 
@@ -85,6 +89,7 @@ route.post('/failureRegister', (req, res) => {
 
 route.get('/create',(req, res)=>{
     if(req.isAuthenticated()){
+        logger.info(`El usuario ${req.user.username} accedió al dashboard`)
         res.render('dashboard',{
             user: req.user.name, avatar: req.user.avatar
             })
