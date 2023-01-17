@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 const {Schema} = mongoose;
 
 //connection
-import Connection from '../loaders/connection';
+import '../loaders/connection.js';
 
 const userSchema = new Schema({
     // username: { 
     //     type: String,
     //     required: true },
-    email: { 
+    username: { 
         type: String,
         unique: true,
         lowercase: true,
@@ -20,8 +20,7 @@ const userSchema = new Schema({
 
     password: { 
         type: String,
-        select: false,
-        match: [/^[a-zA-Z0-9]+$/, 'is invalid'],
+        // match: [/^[a-zA-Z0-9]+$/, 'is invalid'],
         required: [true, "can't be blank"],},
     // date: {}
     name:{

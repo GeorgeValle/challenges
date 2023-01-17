@@ -11,10 +11,11 @@ mongoose.connect(uri,
     useUnifiedTopology: true,
     // useCreateIndex: true,
     // useFindAndModify: false
-}).catch(err => {console.log(err)});
+}).catch(err => {console.log(err)})
 
 ear.once('open',_=>{
     console.log(`Database is connected to: `, uri)
 })
 
-ear.on('error', err => {console.log(`Type error: ${err}`)});
+ear.on('error', err => {console.log(`Type error: ${err}`)})
+
