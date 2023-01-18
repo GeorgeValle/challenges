@@ -1,32 +1,40 @@
-const nodemailer = require('nodemailer')
-const Mailgen = require('mailgen')
+import nodemailer from 'nodemailer'
+import {logInfo} from './Logger.js'
+import dotenv from 'dotenv';
+dotenv.config();
+//const Mailgen = require('mailgen')
 
-const signup = async (req, res) => {
-    let testAccount = await nodemailer.createTestAccount()
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-            user: testAccount.user,
-            pass: testAccount.pass
-        }
-    })
+
+
+const mailToDev = async () => {
+const config = {
+    service: 'gmail',
+    port: 587,
+    auth: {
+    user: process.env.USER_EMAIL,
+    pass: process.env.PASS_EMAIL
+    }
+};
+
     let message = {
-        from: "Leo Messi <leo@messi.com>",
-        to: "alexmarinmendez@gmail.com",
-        subject: "Hello World!!!",
-        html: "<b>Hello World</b>"
+        from: `George <${process.env.USER_EMAIL}>`,
+        to: "jorgevalle@outlook.com.ar",
+        subject: "¡¡¡aviso de nuevo usuario!!!",
+        html: "<b>se ha generado un nuevo usuario</b>"
     }
 
-    transporter.sendMail(message)
-        .then(info => {
-            res.status(201).json({
-                msg: "Revisa tu inbox... tiene sun mensaje",
-                info: info.messageId,
-                preview: nodemailer.getTestMessageUrl(info)
-            })
-        })
-        .catch(err => res.status(500).json({err}))
-   
+
+
+    const transporter = nodemailer.createTransport(config);
+
+    const info = await transporter.sendMail(message)
+    logInfo.info(info);
+
+        
+
 }
+
+
+export {mailToDev}
+
+

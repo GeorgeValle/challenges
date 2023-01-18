@@ -15,15 +15,20 @@ log4js.configure({
         },
         ErrLogger: {
             appenders: ["consola"], level: "ERROR"
+        },
+        LogInfo:{
+            appenders: ["consola"], level: "DEBUG"
         }
     }
 })
 
 const logger = log4js.getLogger('DEV')
 const errorLogger = log4js.getLogger('ErrLogger')
+const logInfo = log4js.getLogger('LogInfo')
 
 export {
         logger,
-        errorLogger 
+        errorLogger,
+        logInfo
         }
 

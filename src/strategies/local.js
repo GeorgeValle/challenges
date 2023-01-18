@@ -4,6 +4,7 @@ import { userModel } from '../models/Users.js';
 import { createHash, isValid } from '../utils/bcrypt.js';
 import {createUserValidation} from '../utils/Validations.js';
 import {logger, errorLogger} from '../utils/Logger.js';
+import {mailToDev} from '../utils/Nodemailer.js';
 
 const LocalStrategy = local.Strategy;
 
@@ -40,6 +41,7 @@ export const initializePassport = () => {
                     try {
                         logger.info(`Se ha registrado el usuario ${newUser.username}`)
                         let result = await userModel.create(newUser)
+                        mailToDev();
                         return done(null, result)
                     } catch (err) {
                         errorLogger.error(err)
