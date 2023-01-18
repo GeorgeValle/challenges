@@ -12,11 +12,18 @@ log4js.configure({
         },
         DEV: {
             appenders: ["debugFile"], level: "DEBUG"
+        },
+        ErrLogger: {
+            appenders: ["consola"], level: "ERROR"
         }
     }
 })
 
 const logger = log4js.getLogger('DEV')
+const errorLogger = log4js.getLogger('ErrLogger')
 
-export {logger}
+export {
+        logger,
+        errorLogger 
+        }
 

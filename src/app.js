@@ -140,6 +140,7 @@ app.use('/productos',productRouter);
 app.use('/carrito',cartRouter);
 app.use('/session',sessionRouter);
 
+//for message in inexistent routes
 app.use((req, res) => {
     res.status(404).send({error: -2, description: `route ${req.baseUrl}${req.url} method ${req.method} not implemented`});
 });

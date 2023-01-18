@@ -3,6 +3,7 @@ import local from 'passport-local';
 import { userModel } from '../models/Users.js';
 import { createHash, isValid } from '../utils/bcrypt.js';
 import {createUserValidation} from '../utils/Validations.js';
+import {logger, errorLogger} from '../utils/Logger.js';
 
 const LocalStrategy = local.Strategy;
 
@@ -14,7 +15,10 @@ export const initializePassport = () => {
             async (req, username, password, done) => {
                 try {
                     let user = await userModel.findOne({ username: username })
-                    if (user) return done(null, false) //error, data
+                    if (user){//error, data
+                        errorLogger.error(`Ya existe el usuario: ${username}`) 
+                        return done(null, false) 
+                        }
                     const newUser = {
                         username,
                         password: createHash(password),
@@ -25,18 +29,24 @@ export const initializePassport = () => {
                         avatar: req.body.avatar
                     }
                     try{
+
+                        
                         createUserValidation(newUser)
                     }
                     catch(err){
-                        return done(null,false, { message: err.message })
+                        errorLogger.error(err)
+                        return done(null,false)
                     }
                     try {
+                        logger.info(`Se ha registrado el usuario ${newUser.username}`)
                         let result = await userModel.create(newUser)
                         return done(null, result)
                     } catch (err) {
+                        errorLogger.error(err)
                         done(err)
                     }
                 } catch(err) {
+                    errorLogger.error(err)
                     done(err)
                 }
             }
@@ -50,10 +60,17 @@ export const initializePassport = () => {
             async(username, password, done) => {
                 try {
                     let user = await userModel.findOne({ username: username })
-                    if (!user) {return done(null, false, {message: 'User not found'})}
-                    if (!isValid(user, password)) return done(null, false, {message: 'Wrong password'})
+                    if (!user) {
+                        errorLogger.error(`No se encontró al usuario ${username}`)
+                        return done(null, false)
+                    }
+                    if (!isValid(user, password)){ 
+                        errorLogger.error(`Password incorrecto `)
+                        return done(null, false, {message: 'Wrong password'})
+                    }
                     return done(null, user)
                 } catch(err) {
+                    errorLogger.error(err)
                     return done(err)
                 }
             }
@@ -72,41 +89,3 @@ export const initializePassport = () => {
     })
 
 }
-
-// const registerStrategy = new LocalStrategy(async (email, password,name, address, age, phone, avatar, cb) => {
-//     try {
-//         const user = await userModel.findOne({email})
-//         if(user){ return cb(null, false, {message: 'User already exist'})}
-
-//         const hash = createHash(password)
-//         const newUser = await userModel.create({email, password: hash, name, address, age, phone, avatar})
-
-//         console.log(newUser)
-//         return cb(null, newUser)
-//     } catch (error) {
-//         return cb(error)
-//     }
-// })
-
-// const loginStrategy = new LocalStrategy(async (email, password, cb) => {
-//     try {
-//         const user = await userModel.findOne({email})
-//         if(!user){ return cb(null, false, { message: 'User does not exist' })}
-
-//         if(!isValid(user, password)){ return cb(null, false, { message: 'Wrong password' })}
-        
-//         return cb(null, user)
-//     } catch (error) {
-//         return cb(error)
-//     }
-// })
-
-// passport.serializeUser((user, cb) => {
-//     cb(null, user._id)
-// })
-
-// passport.deserializeUser((id, cb) => {
-//     userModel.findById(id, cb)
-// })
-
-// export {registerStrategy, loginStrategy};
