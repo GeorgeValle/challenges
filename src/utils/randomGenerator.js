@@ -17,3 +17,4 @@ process.on('message', (msg => {
     const rndList = randomGenerator(parseInt(msg))
     process.send(rndList)
 }))
+

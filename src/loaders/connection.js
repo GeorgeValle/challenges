@@ -11,11 +11,11 @@ mongoose.connect(uri,
     useUnifiedTopology: true,
     // useCreateIndex: true,
     // useFindAndModify: false
-    dbName: 'passport-auth'
+    dbName: 'auth-local'
 }).catch(err => {console.log(err)});
 
 ear.once('open',_=>{
-    console.log(`Database is connected to: `, uri)
+    console.log(`Mongo Database  is connected to: `, uri)
 })
 
 ear.on('error', err => {console.log(`Type error: ${err}`)});

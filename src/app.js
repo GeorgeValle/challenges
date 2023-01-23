@@ -25,6 +25,10 @@ const mode = argv.mode || 'fork'
 const express = require('express');
 const session= require('express-session');
 
+//star server Express
+const app = express();
+
+
 //Compression
 const compression = require('compression');
 
@@ -34,11 +38,13 @@ const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
 const passport = require('passport');
 
-const { registerStrategy, loginStrategy }= require ("./strategies/local");
+const { initializePassport }= require ("./strategies/local");
 
 
-//middleware Compression
-app.use(compression())
+app.use(compression({
+    //level por default
+    level: 6
+}))
 
 //configuration web socket 
 const {Server}= require('socket.io');
@@ -60,9 +66,6 @@ let productsList= require('./models/product.models');
 
 //object knex for db sqlite
 const sqlite = require('./options/sqlite.config')
-
-
-
 
 
 
@@ -90,8 +93,7 @@ if (cluster.isPrimary) {
     }
 } else {
 
-//star server Express
-const app = express();
+
 //const PORT = process.env.PORT||8080;
 
 const tbl_Products ="products";
@@ -131,7 +133,7 @@ app.use(session({
     store: MongoStore.create({ 
         mongoUrl: process.env.DB_MONGO,//process.env.DB_ATLAS,
         mongoOptions: advancedOptions,
-        dbName: 'passport-auth',
+        dbName: 'auth-local',
         collectionName: 'session',
         ttl: 120
     }),
@@ -158,8 +160,11 @@ app.set('views', __dirname+'/views')
 app.set('view engine', 'handlebars')
 
 
-passport.use('register', registerStrategy)
-passport.use('login', loginStrategy)
+//passport initialization
+// passport.use('register', registerStrategy)
+// passport.use('login', loginStrategy)
+
+initializePassport()
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -178,6 +183,18 @@ app.get('/create',(req, res)=>{
 
     }
     else{ res.redirect('/')}
+})
+
+//for message in inexistent routes
+app.use((req, res) => {
+    res.status(404).send({error: -2, description: `route ${req.baseUrl}${req.url} method ${req.method} not implemented`});
+});
+
+app.use((error, req , res, next)=>{
+	res.status(400).json({
+		status: 'error',
+		message: error.message
+	})
 })
 
 //path to routes

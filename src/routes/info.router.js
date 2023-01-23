@@ -1,5 +1,6 @@
 const express = require('express');
 const route = express.Router();
+const {infoLogger} = require('../utils/loggers')
 
 const yargs = require('yargs');
 
@@ -13,6 +14,7 @@ const yargs = require('yargs');
 
 route.get('/info', (req, res) => {
         // res.render('info')
+        infoLogger.info(`Usuario ${req.user.username} a ingresado a ruta Info`)
         res.render('info', {
             argvs: process.argv.slice(2),
             platform: process.platform,

@@ -1,6 +1,7 @@
 const express = require('express');
 const route = express.Router();
 const passport =require ("passport");
+const {errorLogger,infoLogger,consoleLogger,warnLogger} = require('../utils/loggers')
 
 // const sessionChecker =  require ('../models/sessionCheckers');
 
@@ -11,6 +12,7 @@ const passport =require ("passport");
 
 route.get('/', (req, res) => {
     if (!req.isAuthenticated()) {
+        
         res.redirect('/login')
     }
     else{
@@ -29,7 +31,7 @@ route.get('/register', (req, res) => {
 
 
 route.post('/register', passport.authenticate('register', {
-    failureRedirect: '/failureRegister'}),
+    failureRedirect: '/failureRegister'},consoleLogger.error("fail register")),
 (req, res) => {
         res.redirect('/login') 
 }
@@ -50,6 +52,7 @@ route.post('/login', passport.authenticate('login', { failureRedirect: '/failure
 
 route.get('/logout', (req, res) => {
     if (req.isAuthenticated()) {
+        infoLogger.info('logout user: '+req.username)
         res.render('logout', {user: req.user.username})
     } else {
         res.redirect('/login')

@@ -25,6 +25,21 @@
   }
 ```
 
+### instalar el compression
+
+```javascript
+//Compression
+const compression = require('compression');
+
+//middleware Compression antes de la iniciación del server
+app.use(compression({
+    //level por defaault
+    level6
+
+}))
+
+
+```
 
 ## Consignas:
 
@@ -145,7 +160,6 @@ module.exports =route;
     'nodemon ./src/app.js --mode=fork' //(ejecuta modo fork)
     'nodemon ./src/app.js' //(ejecuta modo fork por defecto)
 ```
-en el caso de Forever solo cambia ndemon por forever y para las lista 'forever list'
 
 ### consigna: Ejecutar el servidor (con los parámetros adecuados: modo fork) utilizando PM2 en sus modos fork y cluster. Listar los procesos por PM2 y por sistema operativo
 
