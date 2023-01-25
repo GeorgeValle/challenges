@@ -4,7 +4,7 @@
 const dotenv= require ('dotenv');
 dotenv.config();
 
-const connection= require ('./loaders/connection');
+require ('./loaders/connection');
 
 //Cluster
 const cluster = require('cluster');
@@ -13,17 +13,22 @@ const cluster = require('cluster');
 const processor_count = require('os').cpus().length;
 
 // Yargs
-const yargs = require('yargs')
-const { hideBin } = require('yargs/helpers')
-const argv = yargs(hideBin(process.argv)).argv
-const port = argv.port || 8080
-const mode = argv.mode || 'fork'
+// const yargs = require('yargs')
+// const { hideBin } = require('yargs/helpers')
+// const argv = yargs(hideBin(process.argv)).argv
+// const port = argv.port || 8080
+// const mode = argv.mode || 'fork'
 // end of yargs
 
+//configuration of port whit fork o cluster mode
+const PORT = parseInt(process.argv[2]) || 8080
+const modoCluster = process.argv[3] == 'CLUSTER'
 
 //server Express
 const express = require('express');
 const session= require('express-session');
+
+const {engine} = require('express-handlebars');
 
 //star server Express
 const app = express();
@@ -31,6 +36,24 @@ const app = express();
 
 //Compression
 const compression = require('compression');
+
+
+if (modoCluster && cluster.isPrimary) {
+    const numCPUs = cpus().length
+
+    console.log(`Número de procesadores: ${numCPUs}`)
+    console.log(`PID MASTER ${process.pid}`)
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork()
+    }
+
+    cluster.on('exit', worker => {
+        console.log('Worker', worker.process.pid, 'died', new Date().toLocaleString())
+        cluster.fork()
+    })
+} else {
+
 
 //mongo
 const MongoStore = require('connect-mongo');
@@ -49,7 +72,7 @@ app.use(compression({
 //configuration web socket 
 const {Server}= require('socket.io');
 
-const handlebars = require('express-handlebars');
+
 
 //routes
 const productRouter = require('./routes/product.router');
@@ -70,28 +93,28 @@ const sqlite = require('./options/sqlite.config')
 
 
 // Server Cluster / Fork
-if (cluster.isPrimary) {
-    console.log(`Cantidad de núcleos disponibles: ${processor_count}`)
-    console.log(`Hilo principal en el proceso PID: ${process.pid}`)
-    // Cluster
-    if (mode === 'cluster') {
-        for (let i = 0; i < processor_count; i++) {
-            cluster.fork()
-        }
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`Worker ${worker.process.pid} terminó.`)
-            console.log('Iniciando otro worker...')
-            cluster.fork()
-        })
-    } else {
-        cluster.fork()
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`Worker ${worker.process.pid} terminó.`)
-            console.log('Iniciando otro worker...')
-            cluster.fork()
-        })
-    }
-} else {
+// if (cluster.isPrimary) {
+//     console.log(`Cantidad de núcleos disponibles: ${processor_count}`)
+//     console.log(`Hilo principal en el proceso PID: ${process.pid}`)
+//     // Cluster
+//     if (mode === 'cluster') {
+//         for (let i = 0; i < processor_count; i++) {
+//             cluster.fork()
+//         }
+//         cluster.on('exit', (worker, code, signal) => {
+//             console.log(`Worker ${worker.process.pid} terminó.`)
+//             console.log('Iniciando otro worker...')
+//             cluster.fork()
+//         })
+//     } else {
+//         cluster.fork()
+//         cluster.on('exit', (worker, code, signal) => {
+//             console.log(`Worker ${worker.process.pid} terminó.`)
+//             console.log('Iniciando otro worker...')
+//             cluster.fork()
+//         })
+//     }
+// } else {
 
 
 //const PORT = process.env.PORT||8080;
@@ -99,8 +122,9 @@ if (cluster.isPrimary) {
 const tbl_Products ="products";
 const tbl_chats = "chats";
 
-const server = app.listen(port, async ()=>{
-    console.log(`listening on port ${port}`)
+const server = app.listen(PORT, async ()=>{
+    console.log(`listening on port ${PORT}`)
+    console.log(`PID WORKER ${process.pid}`)
     //table whit MySQl
 try{
     await createTable1(tbl_Products)
@@ -117,6 +141,7 @@ try{
 }
 })
 
+server.on('error', error => console.log(`error in server: ${error} `));
 
 // class chat
 const Manager = require('./controllers/chat.manager');
@@ -154,9 +179,9 @@ app.use('/content', express.static('./src/public'))
 
 
 //views client side
-app.engine('handlebars', handlebars.engine())
+app.engine('handlebars', engine())
 // app.set('views', './src/views')
-app.set('views', __dirname+'/views') 
+app.set('views', './src/views') 
 app.set('view engine', 'handlebars')
 
 
@@ -175,15 +200,7 @@ app.get('/',
 )
 
 
-app.get('/create',(req, res)=>{
-    if(req.isAuthenticated()){
-        res.render('create-product',{
-            user: req.user.username, 
-            })
 
-    }
-    else{ res.redirect('/')}
-})
 
 //for message in inexistent routes
 app.use((req, res) => {
@@ -217,4 +234,6 @@ io.on('connection', socket => {
         io.emit('chatHistory', data)
     })
 })
+
 }
+

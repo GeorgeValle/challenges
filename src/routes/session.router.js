@@ -13,14 +13,14 @@ const {errorLogger,infoLogger,consoleLogger,warnLogger} = require('../utils/logg
 route.get('/', (req, res) => {
     if (!req.isAuthenticated()) {
         
-        res.redirect('/login')
+        res.render('login')
     }
     else{
         res.redirect('/create')
     }
 })
 
-route.get('/register', (req, res) => {
+route.get('register/', (req, res) => {
     if (!req.isAuthenticated()) {
         res.render('signup')
     }
@@ -31,7 +31,7 @@ route.get('/register', (req, res) => {
 
 
 route.post('/register', passport.authenticate('register', {
-    failureRedirect: '/failureRegister'},consoleLogger.error("fail register")),
+    failureRedirect: '/failureRegister'}),
 (req, res) => {
         res.redirect('/login') 
 }
@@ -78,5 +78,14 @@ route.post('/failureRegister', (req, res) => {
     res.render('fail-register')
 })
 
+route.get('/create',(req, res)=>{
+    if(req.isAuthenticated()){
+        res.render('create-product',{
+            user: req.user.username, 
+            })
+
+    }
+    else{ res.redirect('/')}
+})
 
 module.exports =  route
