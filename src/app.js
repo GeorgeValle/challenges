@@ -8,9 +8,11 @@ require ('./loaders/connection');
 
 //Cluster
 const cluster = require('cluster');
+const {infoRouter, randomRouter, sessionRouter} = require('./routes')
 
 //CPUs 
-const processor_count = require('os').cpus().length;
+// const processor_count = require('os').cpus().length;
+
 
 // Yargs
 // const yargs = require('yargs')
@@ -70,85 +72,32 @@ app.use(compression({
 }))
 
 //configuration web socket 
-const {Server}= require('socket.io');
-
-
 
 //routes
-const productRouter = require('./routes/product.router');
-const chatRouter = require('./routes/chat.router');
-const infoRouter = require('./routes/info.router');
-const randomRouter = require('./routes/random.router');
+
+// const productRouter = require('./routes/product.router');
+// const chatRouter = require('./routes/chat.router');
+// const infoRouter = require('./routes/info.router');
+// const randomRouter = require('./routes/random.router');
 //path route session
-const sessionRouter = require('./routes/session.router')
+// const sessionRouter = require('./routes/session.router')
 
-const createTable1 = require('./options/createTable1');
-const createTable2 = require('./options/createTable2');    
-
-let productsList= require('./models/product.models');
-
+    
 //object knex for db sqlite
-const sqlite = require('./options/sqlite.config')
 
-
-
-// Server Cluster / Fork
-// if (cluster.isPrimary) {
-//     console.log(`Cantidad de núcleos disponibles: ${processor_count}`)
-//     console.log(`Hilo principal en el proceso PID: ${process.pid}`)
-//     // Cluster
-//     if (mode === 'cluster') {
-//         for (let i = 0; i < processor_count; i++) {
-//             cluster.fork()
-//         }
-//         cluster.on('exit', (worker, code, signal) => {
-//             console.log(`Worker ${worker.process.pid} terminó.`)
-//             console.log('Iniciando otro worker...')
-//             cluster.fork()
-//         })
-//     } else {
-//         cluster.fork()
-//         cluster.on('exit', (worker, code, signal) => {
-//             console.log(`Worker ${worker.process.pid} terminó.`)
-//             console.log('Iniciando otro worker...')
-//             cluster.fork()
-//         })
-//     }
-// } else {
-
-
-//const PORT = process.env.PORT||8080;
-
-const tbl_Products ="products";
-const tbl_chats = "chats";
 
 const server = app.listen(PORT, async ()=>{
     console.log(`listening on port ${PORT}`)
     console.log(`PID WORKER ${process.pid}`)
     //table whit MySQl
-try{
-    await createTable1(tbl_Products)
-    console.log('Databases was created!')
-}catch {
-    console.log('Error in databases tables creation')
-}
 //Table whit sqlLite
-try{
-    await createTable2(tbl_chats)
-    console.log('Databases was created!')
-}catch {
-    console.log('Error in databases tables creation')
-}
+
 })
 
 server.on('error', error => console.log(`error in server: ${error} `));
 
 // class chat
-const Manager = require('./controllers/chat.manager');
-const { application } = require('express');
-const manager = new Manager(sqlite,tbl_chats);
 
-const io = new Server(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
@@ -214,26 +163,20 @@ app.use((error, req , res, next)=>{
 	})
 })
 
-//path to routes
-app.use('/products', productRouter)
-app.use('/chat', chatRouter)
-app.use('/session',sessionRouter)
-app.use('/info', infoRouter)
-app.use('/random', randomRouter);
+//path to routes before
+// app.use('/products', productRouter)
+// app.use('/chat', chatRouter)
+// app.use('/session',sessionRouter)
+// app.use('/info', infoRouter)
+// app.use('/random', randomRouter);
+
+//path routes now
+infoRouter(app)
+randomRouter(app)
+sessionRouter(app)
 
 //event connection
-io.on('connection', socket => {
-    console.log(`Client ${socket.id} connected...`)
-    //send product list 
-    socket.emit('history', productsList)
-    manager.findAll().then(result => socket.emit('chatHistory', result))
-    socket.on('products', data => {
-        io.emit('history', data)
-    })
-    socket.on('chat', data => {
-        io.emit('chatHistory', data)
-    })
-})
+
 
 }
 
