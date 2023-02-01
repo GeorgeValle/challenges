@@ -1,33 +1,22 @@
 const express = require('express');
 const route = express.Router();
 const passport =require ("passport");
-const {errorLogger,infoLogger,consoleLogger,warnLogger} = require('../utils/loggers')
+const {
+    getAuthManager,
+getRegisterManager,
+getLoginManager,
+getAuthLogoutManager,
+deleteAuthLogoutManager,
+postAuthFailureLogin,
+postAuthFailureRegister,
+getAuthDashboard
+} = require('../controllers/sessionManager')
 
-// const sessionChecker =  require ('../models/sessionCheckers');
-
-// route.get('/login', sessionChecker, (req, res) => {
-//     res.redirect('/login')
-// })
 
 
-route.get('/', (req, res) => {
-    if (!req.isAuthenticated()) {
-        
-        res.render('login')
-    }
-    else{
-        res.redirect('/create')
-    }
-})
+route.get('/', getAuthManager )
 
-route.get('register/', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.render('signup')
-    }
-    else {
-        res.redirect('/create')
-    }
-})
+route.get('register/', getRegisterManager)
 
 
 route.post('/register', passport.authenticate('register', {
@@ -37,55 +26,21 @@ route.post('/register', passport.authenticate('register', {
 }
 )
 
-route.get('/login', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.render('login')
-    }
-    else {
-        res.redirect('/create')
-    }
-})
+route.get('/login',getLoginManager )
 
 route.post('/login', passport.authenticate('login', { failureRedirect: '/failureLogin'}), (req, res) => {
     res.redirect('/create')
 })
 
-route.get('/logout', (req, res) => {
-    if (req.isAuthenticated()) {
-        infoLogger.info('logout user: '+req.username)
-        res.render('logout', {user: req.user.username})
-    } else {
-        res.redirect('/login')
-    }
-})
+route.get('/logout', getAuthLogoutManager )
 
 
-route.delete('/logout', (req, res) => {
-    if (req.isAuthenticated()) {
-            return res.redirect('/login')
-    }
-    else{
-        return res.redirect('/login')
-    }
-})
+route.delete('/logout', deleteAuthLogoutManager)
 
+route.post('/failureLogin', postAuthFailureLogin)
 
-route.post('/failureLogin', (req, res) => {
-    res.render('fail-login')
-})
+route.post('/failureRegister', postAuthFailureRegister)
 
-route.post('/failureRegister', (req, res) => {
-    res.render('fail-register')
-})
-
-route.get('/create',(req, res)=>{
-    if(req.isAuthenticated()){
-        res.render('create-product',{
-            user: req.user.username, 
-            })
-
-    }
-    else{ res.redirect('/')}
-})
+route.get('/create', getAuthDashboard)
 
 module.exports =  route
