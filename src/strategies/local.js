@@ -1,6 +1,6 @@
 const local = require ('passport-local');
 const passport = require ('passport')
-const { userModel } = require ('../models/users')
+const { userModel } = require ('../daos/userDao')
 const { createHash, isValid } = require ('../utils/bcrypt')
 const {errorLogger,infoLogger,consoleLogger,} = require('../utils/loggers')
 

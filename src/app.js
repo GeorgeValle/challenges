@@ -8,7 +8,12 @@ require ('./loaders/connection');
 
 //Cluster
 const cluster = require('cluster');
-const {infoRouter, randomRouter, sessionRouter} = require('./routes')
+
+//routes
+const infoRouter = require('./routes/info.router')
+const randomRouter = require('./routes/random.router')
+const sessionRouter = require('./routes/session.router')
+const productRouter = require('./routes/product.router')
 
 //CPUs 
 // const processor_count = require('os').cpus().length;
@@ -171,9 +176,15 @@ app.use((error, req , res, next)=>{
 // app.use('/random', randomRouter);
 
 //path routes now
-infoRouter(app)
-randomRouter(app)
-sessionRouter(app)
+// infoRouter(app)
+// randomRouter(app)
+// sessionRouter(app)
+app.use('/info', infoRouter)
+app.use('/session', sessionRouter)
+app.use('/random', randomRouter)
+app.use('/product', productRouter)
+
+
 
 //event connection
 
