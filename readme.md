@@ -1,29 +1,12 @@
-# Pasos Hechos en Desafio 40 daos
+# Pasos Hechos en Desafio 42 testin
 
-## Dependencias
-```javascript
-   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "connect-mongo": "^4.6.0",
-    "cookie": "^0.5.0",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.1",
-    "express-handlebars": "^6.0.6",
-    "express-session": "^1.17.3",
-    "knex": "^2.3.0",
-    "mongodb": "^4.11.0",
-    "moongose": "^1.0.0",
-    "mysql": "^2.18.1",
-    "nodemon": "^2.0.20",
-    "parser": "^0.1.4",
-    "passport": "^0.6.0",
-    "passport-local": "^1.0.0",
-    "session-file-store": "^1.5.0",
-    "socket.io": "^4.5.2",
-    "sqlite3": "^5.1.2"
-  }
-```
+* se completaroin todas las funciones del DAO file sistem en la carpeta DAO. se exportaron las funciones al servicio luego este se lo transfirió al controler para que este lo pase a la route. 
+
+* se crearon dos test.js en la carpeta test. uno automatizado con mocha y el otro manual con axios. 
+
+* uno se ejecuta con NPM run auto y el otro con NPM run test.
+
+
 
 ### instalar el compression
 
