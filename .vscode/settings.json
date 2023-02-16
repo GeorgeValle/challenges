@@ -1,20 +1,21 @@
 {
     "cSpell.words": [
-        "carrito",
-        "Cartsrouter",
-        "Comprar",
-        "Direcci",
-        "Edad",
-        "entrega",
-        "Firestore",
-        "fono",
-        "IIEF",
-        "Nombre",
-        "pintar",
-        "primera",
-        "productos",
-        "Productsrouter",
-        "Signup"
+        "argumentos",
+        "argvs",
+        "daos",
+        "desafio",
+        "dtos",
+        "ecommerce",
+        "hechos",
+        "memoria",
+        "moongose",
+        "nombre",
+        "Número",
+        "Pasos",
+        "proccess",
+        "procesadores",
+        "resave",
+        "signup"
     ],
     "cSpell.enableFiletypes": [
         "!markdown"

@@ -1,33 +1,21 @@
-<div >
-            <h1>Signup </h1>
+<div class="page-header">
+            <h1>Signup Auth</h1>
         </div>
+ 
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                    
+                        <li><a href="/session/login">Log IN</a></li>
+                        <li><a href="/create">Dashboard</a></li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
 
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link " aria-current="page" href="/home">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="/session/register">Signup</a>
-        </li>
-
-        <li class="nav-item ">
-          <a class="nav-link " href="/session/login">Login</a>
-        </li>
-      </ul>
-      
-    </div>
-  </div>
-</nav>
-
-        <div class="container row mt-3">
+        <div class="container row">
             <div class="jumbotron col-sm-4 pull-center">
                 <form autocomplete="off" action="/session/register" method="post">
                     <div class="form-group">
@@ -40,33 +28,7 @@
                         <label>Password:</label>
                         <input class="form-control" required type="password" name="password"/>
                     </div>
-
                     <div class="form-group">
-                        <label>Nombre:</label>
-                        <input class="form-control" required type="text" name="name"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Direcci&#243;n</label>
-                        <input class="form-control" required type="text" name="address"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Edad</label>
-                        <input class="form-control" required type="number" name="age"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label>tel&#233;fono</label>
-                        <input class="form-control" required type="number" name="phone"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Avatar</label>
-                        <input class="form-control" required type="text" name="avatar"/>
-                    </div>
-
-                    <div class="form-group mt-3">
                         <input class="btn btn-primary" type="submit" value="Sign Up"/>
                     </div>
                 </form>                  

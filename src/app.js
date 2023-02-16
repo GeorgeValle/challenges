@@ -1,45 +1,49 @@
-//Dotenv config
-import dotenv from 'dotenv';
+//Dotenv config 
+// const dotenv = require('dotenv');
+// dotenv.config({path: './'});
+const dotenv= require ('dotenv');
 dotenv.config();
 
-//server Express
-import express from 'express';
+require ('./loaders/connection');
 
-//import fork o cluster from Express
-import cluster from 'cluster'
-import { cpus } from 'os'
+//Cluster
+const cluster = require('cluster');
 
+//routes
+const infoRouter = require('./routes/info.router')
+const randomRouter = require('./routes/random.router')
+const sessionRouter = require('./routes/session.router')
+const productRouter = require('./routes/product.router')
 
-//import of passport
-import passport from 'passport';
-import { initializePassport } from "./strategies/local.js";
-
-
-import session from 'express-session';
-//import MongoStore
-import './loaders/connection.js';
-import MongoStore from 'connect-mongo';
-const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
-
-//import handlebars
-import { engine } from 'express-handlebars';
-
-//import routes
-import {productRouter} from './routes/ProductsRouter.js';
-import {cartRouter} from './routes/CartsRouter.js';
-import {sessionRouter} from './routes/SessionRouter.js';
+//CPUs 
+// const processor_count = require('os').cpus().length;
 
 
-
-//const PORT = process.env.PORT||8080;
+// Yargs
+// const yargs = require('yargs')
+// const { hideBin } = require('yargs/helpers')
+// const argv = yargs(hideBin(process.argv)).argv
+// const port = argv.port || 8080
+// const mode = argv.mode || 'fork'
+// end of yargs
 
 //configuration of port whit fork o cluster mode
 const PORT = parseInt(process.argv[2]) || 8080
 const modoCluster = process.argv[3] == 'CLUSTER'
 
-//configure express
-//const app = express();
+//server Express
+const express = require('express');
+const session= require('express-session');
+
+const {engine} = require('express-handlebars');
+
+//star server Express
 const app = express();
+
+
+//Compression
+const compression = require('compression');
+
 
 if (modoCluster && cluster.isPrimary) {
     const numCPUs = cpus().length
@@ -56,33 +60,64 @@ if (modoCluster && cluster.isPrimary) {
         cluster.fork()
     })
 } else {
-    //const app = express()
 
 
+//mongo
+const MongoStore = require('connect-mongo');
+const advancedOptions = {useNewUrlParser: true, useUnifiedTopology: true}
 
-const server = app.listen(PORT,()=>{
-    console.log(`listening on ${PORT}`)
+const passport = require('passport');
+
+const { initializePassport }= require ("./strategies/local");
+
+
+app.use(compression({
+    //level por default
+    level: 6
+}))
+
+//configuration web socket 
+
+//routes
+
+// const productRouter = require('./routes/product.router');
+// const chatRouter = require('./routes/chat.router');
+// const infoRouter = require('./routes/info.router');
+// const randomRouter = require('./routes/random.router');
+//path route session
+// const sessionRouter = require('./routes/session.router')
+
+    
+//object knex for db sqlite
+
+
+const server = app.listen(PORT, async ()=>{
+    console.log(`listening on port ${PORT}`)
     console.log(`PID WORKER ${process.pid}`)
-});
+    //table whit MySQl
+//Table whit sqlLite
+
+})
 
 server.on('error', error => console.log(`error in server: ${error} `));
 
-//middleware of json
+// class chat
+
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended:true }));
 
-
-//Mongo configuration
+//session
 app.use(session({
     store: MongoStore.create({ 
-        mongoUrl: process.env.DB_ATLAS,
+        mongoUrl: process.env.DB_MONGO,//process.env.DB_ATLAS,
         mongoOptions: advancedOptions,
-        dbName: 'passport-auth',
+        dbName: 'auth-local',
         collectionName: 'session',
-        ttl: 1200
+        ttl: 120
     }),
         key: 'user_sid',
-        secret: 'library',
+        secret: 'coder',
         resave:false,
         saveUninitialized: false,
         // cookie:{
@@ -90,10 +125,13 @@ app.use(session({
         // }
 }))
 
+//middleware Compression
+app.use(compression())
 
 app.use('/content', express.static('./src/public'))
 
-//handlebars configuration
+
+
 //views client side
 app.engine('handlebars', engine())
 // app.set('views', './src/views')
@@ -101,44 +139,22 @@ app.set('views', './src/views')
 app.set('view engine', 'handlebars')
 
 
-
-
 //passport initialization
 // passport.use('register', registerStrategy)
 // passport.use('login', loginStrategy)
 
 initializePassport()
+
 app.use(passport.initialize())
 app.use(passport.session())
 
-//root route handlebars
+
 app.get('/', 
     (req, res) => res.redirect('/session')   
 )
 
-// app.get('/create',(req, res)=>{
-//     if(req.isAuthenticated()){
-//         res.render('dashboard',{
-//             user: req.user.name, avatar: req.user.avatar
-//             })
 
-//     }
-//     else{ res.redirect('/')}
-// })
 
-app.get('/home',(req, res)=>{
-    if(req.isAuthenticated()){
-
-        res.redirect('/session/create')
-
-    }
-    else{ res.redirect('/')}
-})
-
-//routes to books and carts
-app.use('/productos',productRouter);
-app.use('/carrito',cartRouter);
-app.use('/session',sessionRouter);
 
 //for message in inexistent routes
 app.use((req, res) => {
@@ -152,9 +168,26 @@ app.use((error, req , res, next)=>{
 	})
 })
 
+//path to routes before
+// app.use('/products', productRouter)
+// app.use('/chat', chatRouter)
+// app.use('/session',sessionRouter)
+// app.use('/info', infoRouter)
+// app.use('/random', randomRouter);
+
+//path routes now
+// infoRouter(app)
+// randomRouter(app)
+// sessionRouter(app)
+app.use('/info', infoRouter)
+app.use('/session', sessionRouter)
+app.use('/random', randomRouter)
+app.use('/product', productRouter)
+
+
+
+//event connection
+
+
 }
 
-
-
-
-export default app;
