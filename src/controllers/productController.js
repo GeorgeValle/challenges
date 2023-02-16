@@ -16,6 +16,27 @@ const saveProduct = async (req, res) => {
     res.send(new ProductDTO(result))
 }
 
+const getProductById = async (req, res) => {
+    let id = req.params.id
+    let result = await productService.getProductById(id)
+    res.send(new ProductDTO(result))
+}
+
+const deleteProductById = async (req, res) => {
+    let id = req.params.id
+    let result = await productService.deleteProductById(id)
+    res.send(result)
+}
+
+const deleteAllProducts = async (req, res) => {
+    let result = await productService.deleteAllProducts()
+    res.send(result)
+}
+
 module.exports =  {
-    saveProduct, getProducts
+    saveProduct,
+    getProducts,
+    getProductById,
+    deleteProductById,
+    deleteAllProducts
 }

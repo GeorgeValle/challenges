@@ -19,4 +19,16 @@ module.exports = class ProductsService {
     addProduct = async(product) => {
         return await this.productsDao.save(product)
     }
+
+    getProductById = async(id) => {
+        return await this,productDao.getById(id)
+    }
+
+    deleteProductById = async(id) => {
+        return await this.productsDao.deleteById(id)
+    }
+
+    deleteAllProducts = async() => {
+        return await this.productsDao.deleteAll()
+    }
 }
