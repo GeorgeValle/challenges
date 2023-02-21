@@ -1,0 +1,74 @@
+#end point:
+*Post siempre
+
+http://localhost:8080/test
+
+#crear producto:
+
+mutation{
+	createProduct(name:"Juguera",description:"Produce jugo de distintas frutas",price:15000,stock:8){
+		id
+	}
+}
+
+
+
+#productos para cargar:
+
+{
+name:"Juguera",description:"Produce jugo de distintas frutas",price:15000,stock:8
+}
+{
+name:"Lustradora",description:"Lustra los pisos encerados",price:17000,stock:6
+}
+{
+name:"Batidora",description:"Bate los ingrdientes",price:11000,stock:15
+}
+
+
+#todos los productos:
+
+{
+products{
+	id,
+	name,
+	description
+	}
+}
+
+#traer por Id:
+
+{
+	productById(id:1){
+		name,
+		price
+		}
+}
+
+#modificar:
+
+mutation{
+	modifyProduct(id:1, name:"Jarra Electrica",description:"envase de un litro para enfriar liquidos",price:1200,stock:12){
+		id,
+		name
+	}
+}
+
+#borrar 1:
+mutation{
+	deleteOneProduct(id:2){
+		id,
+		name
+	}
+}
+
+#borrar todos:
+
+mutation{
+	deleteAllProducts(){
+		id
+	}
+}
+
+
+

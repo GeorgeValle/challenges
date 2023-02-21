@@ -1,58 +1,38 @@
 import express from 'express'
 import { graphqlHTTP } from 'express-graphql'
 import { buildSchema } from 'graphql'
+import product from './services/products.js' 
 
 const app = express()
-app.listen(8080, () => console.log('Server Up'))
-
-let clients = [
-    {
-        id: 1,
-        name: 'Alex',
-        phone: '123'
-    },
-    {
-        id: 2,
-        name: 'Shakira',
-        phone: '456'
-    },
-    {
-        id: 3,
-        name: 'Piqué',
-        phone: '789'
-    },
-]
-let counter = 4
+app.listen(8080, () => console.log('Server Online'))
 
 let schema = buildSchema(`
-    type Client{
+    type Products{
         id: Int
         name: String
-        phone: String
+        description: String
+        price: Float
+        stock: Int
     }
     type Query{
-        clients: [Client]
-        clientById(id:Int): Client
+        products: [Products]
+        productById(id:Int): Products
     }
     type Mutation{
-        addClient(name:String, phone:String): Client
+        createProduct(name:String, description:String, price:Float, stock:Int): Products
+        deleteAllProducts: [Products]
+        deleteOneProduct(id:Int): [Products]
+        modifyProduct(id:Int, name:String, description:String, price:Float, stock:Int): Products
     }
 `)
 
 const root = {
-    clients: () => clients,
-    clientById: (data) => {
-        for (let i=0; i<clients.length; i++) {
-            if (clients[i].id === data.id) return clients[i]
-        }
-        return {}
-    },
-    addClient: (data) => {
-        let client = { 'id': counter, 'name': data.name, 'phone': data.phone}
-        clients.push(client)
-        counter++
-        return client
-    }
+    products: () => product.getProducts(),
+    productById: (id) =>product.getById(id),
+    createProduct: (data) => product.createProduct(data),
+    deleteAllProducts: () => product.deleteAllProducts(),
+    modifyProduct: (data) => product.modifyProduct(data),
+    deleteOneProduct: (id) => product.deleteOneProduct(id)
 }
 
 app.use('/test', graphqlHTTP({
